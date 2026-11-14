@@ -1,0 +1,75 @@
+{
+  "package": "geartowns",
+  "effectiveTerms": "GPL-3.0-or-later",
+  "commercialUse": "allowed under the GPL",
+  "note": "The built core combines this repository's MIT integration with Geartowns and the libraries it carries, and is distributed under the GPL-3.0-or-later. The source of each part is linked below by exact commit. No firmware is in the package: the FM Towns ROMs are the user's.",
+  "components": [
+    {
+      "name": "chimera-core-geartowns (integration)",
+      "license": "MIT, with GPL-3.0-or-later patches",
+      "url": "https://github.com/ToolAssisted-run/chimera-core-geartowns",
+      "commit": "{selfCommit}",
+      "file": "LICENSE",
+      "sourceUrl": "https://github.com/ToolAssisted-run/chimera-core-geartowns/archive/{commit}.tar.gz"
+    },
+    {
+      "name": "Geartowns",
+      "license": "GPL-3.0-or-later",
+      "url": "https://github.com/drhelius/Geartowns",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/LICENSE",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz"
+    },
+    {
+      "name": "Bochs x87 arithmetic (Berkeley SoftFloat 3e and the Bochs FPU, carried by Geartowns)",
+      "license": "BSD-3-Clause; fpu_trans.h LGPL-2.1-or-later",
+      "url": "https://github.com/bochs-emu/Bochs",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/bochs_fpu/COPYING.txt",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz",
+      "note": "platforms/shared/dependencies/bochs_fpu in Geartowns' source. The LGPL-2.1 text is COPYING.LESSER beside it."
+    },
+    {
+      "name": "libchdr (carried by Geartowns)",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/rtissera/libchdr",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/libchdr/LICENSE.txt",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz"
+    },
+    {
+      "name": "zstd decoder (carried by Geartowns, built into libchdr)",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/facebook/zstd",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/zstd/zstddeclib.c",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz",
+      "note": "The licence notice is at the top of zstddeclib.c (BSD, or GPL-2.0 at the user's choice)."
+    },
+    {
+      "name": "LZMA SDK (carried by Geartowns)",
+      "license": "Public domain",
+      "url": "https://www.7-zip.org/sdk.html",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/lzma/LICENSE",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz"
+    },
+    {
+      "name": "minivorbis (libogg and libvorbis, carried by Geartowns)",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/edubart/minivorbis",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/minivorbis/LICENSE.txt",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz"
+    },
+    {
+      "name": "miniz (carried by Geartowns)",
+      "license": "MIT",
+      "url": "https://github.com/richgel999/miniz",
+      "commit": "{submodule:extern/geartowns}",
+      "file": "extern/geartowns/platforms/shared/dependencies/miniz/miniz.c",
+      "sourceUrl": "https://github.com/drhelius/Geartowns/archive/{commit}.tar.gz",
+      "note": "The MIT notice is at the top of miniz.c."
+    }
+  ]
+}

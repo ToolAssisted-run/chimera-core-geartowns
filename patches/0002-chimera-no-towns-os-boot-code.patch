@@ -1,0 +1,46 @@
+diff -ru a/src/drive/floppy_image.cpp b/src/drive/floppy_image.cpp
+--- a/src/drive/floppy_image.cpp
++++ b/src/drive/floppy_image.cpp
+@@ -68,6 +68,11 @@
+ static const u8 k_floppy_boot_header[11] = { 'I', 'P', 'L', '4', 0xEB, 0x4D, 0x06, ' ', ' ', ' ', ' ' };
+ static const char k_floppy_volume_label[] = "USERDISK";
+ static const u32 k_floppy_boot_loader_offset = 0x35;
++#if defined(GT_CHIMERA_NO_TOWNS_OS_CODE)
++// Chimera: the boot code Towns OS's FORMAT writes is Fujitsu's, so it is left out
++// of the build and a blank disk made here carries none
++static const u8 k_floppy_boot_loader[459] = { 0 };
++#else
+ static const u8 k_floppy_boot_loader[459] =
+ {
+     0x40, 0x00, 0x03, 0xAE, 0x01, 0x24, 0x01, 0xC7, 0x00, 0xAE, 0x01, 0x0A, 0x01, 0x88, 0x00, 0xBB,
+@@ -100,6 +105,7 @@
+     0x75, 0xD1, 0xB4, 0x03, 0x5D, 0x59, 0xC3, 0x1E, 0xA0, 0x30, 0x00, 0xB4, 0x03, 0x9A, 0x14, 0x00,
+     0xFB, 0xFF, 0x80, 0xFC, 0x00, 0x74, 0x02, 0xB4, 0x02, 0x1F, 0xC3
+ };
++#endif
+ 
+ static const u32 k_floppy_mfm_header_size = 19;
+ static const u32 k_floppy_mfm_entry_size = 11;
+diff -ru a/src/drive/hard_disk_image.cpp b/src/drive/hard_disk_image.cpp
+--- a/src/drive/hard_disk_image.cpp
++++ b/src/drive/hard_disk_image.cpp
+@@ -55,6 +55,11 @@
+ static const u8 k_hard_disk_signature[6] = { 0x95, 0x78, 0x8E, 0x6D, 0x92, 0xCA };
+ static const u8 k_hard_disk_boot_header[11] = { 'I', 'P', 'L', '4', 0xEB, 0x4D, 0x06, ' ', ' ', ' ', ' ' };
+ static const char k_hard_disk_label[] = "USERDISK";
++#if defined(GT_CHIMERA_NO_TOWNS_OS_CODE)
++// Chimera: Towns OS's hard disk boot code (HD IPL V1.1) is Fujitsu's, so it is
++// left out of the build and a blank disk made here carries none
++static const u8 k_hard_disk_ipl[275] = { 0 };
++#else
+ static const u8 k_hard_disk_ipl[275] =
+ {
+     0x49, 0x50, 0x4C, 0x34, 0xEB, 0x15, 0x90, 0x48, 0x44, 0x20, 0x49, 0x50, 0x4C, 0x20, 0x56, 0x31,
+@@ -76,6 +81,7 @@
+     0x6A, 0x87, 0x71, 0x92, 0x6D, 0x35, 0x70, 0x43, 0x76, 0x45, 0x7D, 0x9D, 0x49, 0x50, 0x4C, 0x34,
+     0x00, 0x00, 0x04
+ };
++#endif
+ 
+ static chd_file* OpenHardDiskChd(const char* path, ChdFileAdapter* adapter, u32* blocks, chd_error* error)
+ {

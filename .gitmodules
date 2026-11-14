@@ -1,0 +1,4 @@
+[submodule "extern/geartowns"]
+	path = extern/geartowns
+	url = https://github.com/drhelius/Geartowns
+	shallow = true

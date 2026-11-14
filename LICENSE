@@ -1,0 +1,48 @@
+This repository is licensed as follows:
+
+- The integration and everything else original to this repository
+  (waterbox/, tests/, the build files, waterbox.config,
+  default_keybinds.json, docs/) is under the MIT License below.
+
+- patches/ holds changes to Geartowns' own source files. They are
+  GPL-3.0-or-later, like Geartowns itself.
+
+- Geartowns is the submodule extern/geartowns, unmodified, under its own
+  license, the GNU General Public License version 3 or later
+  (extern/geartowns/LICENSE). It carries libraries under their own terms
+  (BSD-3-Clause, MIT, public domain, LGPL-2.1-or-later for one Bochs
+  header); waterbox/package-licenses.json names each.
+
+- BUILT FILES (core.wbx and the geartowns.chimeraCore package) combine this
+  repository's code with Geartowns and are distributed under the
+  GPL-3.0-or-later. The MIT License below permits that combination. The
+  package carries every licence text, and the exact source of each part is
+  linked from it by commit.
+
+- No FM Towns firmware is in this repository or in the package. The test
+  program in tests/free is our own; the test scripts give it to the
+  machine in place of the system ROM.
+
+----------------------------------------------------------------------------
+
+MIT License
+
+Copyright (c) 2026 Sergio Martin and the chimera-core-geartowns contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

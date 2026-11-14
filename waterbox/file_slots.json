@@ -1,0 +1,21 @@
+{
+  "_comment": "This file lists the kinds of file an FM Towns project can hold. Chimera's New Project window is built from it. A project has floppy disks, CDs, or both; the machine also starts with neither, to its own menu or prompt. The order of the files in a slot is the order the Next Floppy Disk and Next CD buttons change them in: the first floppy is in drive 1 and the first CD in the drive at power on.",
+  "slots": [
+    {
+      "id": "cdrom",
+      "title": "slot.cdrom",
+      "min": 0,
+      "max": -1,
+      "formats": ["cue", "iso", "chd"],
+      "help": "slot.cdrom.help"
+    },
+    {
+      "id": "floppy",
+      "title": "slot.floppy",
+      "min": 0,
+      "max": -1,
+      "formats": ["d77", "d88", "hdm", "xdf", "img", "mfm"],
+      "help": "slot.floppy.help"
+    }
+  ]
+}

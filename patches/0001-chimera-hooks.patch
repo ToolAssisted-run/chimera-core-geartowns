@@ -1,0 +1,38 @@
+diff -ru a/src/common/common.h b/src/common/common.h
+--- a/src/common/common.h
++++ b/src/common/common.h
+@@ -355,6 +355,14 @@
+ 
+ inline void append_path_component(std::string& path, const char* component)
+ {
++    // Chimera: "." is the folder of the files Chimera mounts, which are found
++    // by their bare names
++    if (path == ".")
++    {
++        path = component;
++        return;
++    }
++
+     if (path.length() > 0)
+     {
+         char last = path[path.length() - 1];
+diff -ru a/src/system/io.cpp b/src/system/io.cpp
+--- a/src/system/io.cpp
++++ b/src/system/io.cpp
+@@ -101,8 +101,16 @@
+     return value;
+ }
+ 
++// Chimera: told of every read of the game ports and the keyboard, which is
++// how a frame is known to have read its controls
++void (*g_gt_input_read_hook)(void) = NULL;
++
+ u8 IO::ReadPort(u16 port, GT_Bus_Access_Context& context)
+ {
++    if (unlikely(g_gt_input_read_hook != NULL) &&
++        ((port == 0x04D0) || (port == 0x04D2) || (port == 0x0600) || (port == 0x0602)))
++        g_gt_input_read_hook();
++
+     switch (port)
+     {
+         case 0x0000:
