@@ -107,6 +107,12 @@
 		"slot.cdrom": "Cd'er",
 		"slot.cdrom.help": "Cd-billeder: et .cue-ark med dets spor, en .iso eller en .chd. Den første er i drevet ved start; knappen Next CD skifter til den næste.",
 		"slot.floppy": "Disketter",
-		"slot.floppy.help": "Disketteaftryk (.d77, .d88, .hdm, .xdf, .img, .mfm). Den første er i drev 1 ved start; knappen Next Floppy Disk sætter den næste i drev 1. Det, et spil skriver, bliver i maskinen og dens gemte tilstande, og filerne ændres aldrig."
+		"slot.floppy.help": "Disketteaftryk (.d77, .d88, .hdm, .xdf, .img, .mfm). Den første er i drev 1 ved start; knappen Next Floppy Disk sætter den næste i drev 1. Det, et spil skriver, bliver i maskinen og dens gemte tilstande, og filerne ændres aldrig.",
+		"tool.blank_floppy": "Lav en tom diskette...",
+		"tool.blank_floppy.about": "Laver en formateret, tom diskette på 1232 KB, som Towns OS' FORMAT ville gøre. Mange spil gemmer på spillerens egen disk og beder om en tom: føj den disk, der laves, til projektets diskettestik.",
+		"tool.blank_floppy.disk": "Tom disk",
+		"tool.blank_floppy.done": "Den tomme diskette blev lavet.",
+		"tool.blank_floppy.failed": "Den tomme diskette kunne ikke skrives.",
+		"tool.unknown": "Denne kerne har ikke det værktøj."
 	}
 }

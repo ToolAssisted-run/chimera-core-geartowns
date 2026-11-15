@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "CD 이미지: 트랙이 딸린 .cue 시트, .iso 또는 .chd. 전원을 켤 때 첫 번째가 드라이브에 들어 있고, Next CD 버튼으로 다음으로 바뀝니다.",
 		"slot.floppy": "플로피 디스크",
-		"slot.floppy.help": "플로피 디스크 이미지(.d77, .d88, .hdm, .xdf, .img, .mfm). 전원을 켤 때 첫 번째가 드라이브 1에 들어 있고, Next Floppy Disk 버튼으로 다음 것을 드라이브 1에 넣습니다. 게임이 쓴 내용은 기계와 그 상태 저장에 남고 파일은 바뀌지 않습니다."
+		"slot.floppy.help": "플로피 디스크 이미지(.d77, .d88, .hdm, .xdf, .img, .mfm). 전원을 켤 때 첫 번째가 드라이브 1에 들어 있고, Next Floppy Disk 버튼으로 다음 것을 드라이브 1에 넣습니다. 게임이 쓴 내용은 기계와 그 상태 저장에 남고 파일은 바뀌지 않습니다.",
+		"tool.blank_floppy": "빈 플로피 디스크 만들기...",
+		"tool.blank_floppy.about": "Towns OS의 FORMAT처럼 포맷된 빈 1232 KB 플로피 디스크를 만듭니다. 많은 게임이 플레이어의 디스크에 저장하며 빈 디스크를 요구합니다. 만든 디스크를 프로젝트의 플로피 슬롯에 추가하세요.",
+		"tool.blank_floppy.disk": "빈 디스크",
+		"tool.blank_floppy.done": "빈 플로피 디스크를 만들었습니다.",
+		"tool.blank_floppy.failed": "빈 플로피 디스크를 쓸 수 없습니다.",
+		"tool.unknown": "이 코어에는 그런 도구가 없습니다."
 	}
 }

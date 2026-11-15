@@ -107,6 +107,12 @@
 		"slot.cdrom": "Cd's",
 		"slot.cdrom.help": "Cd-images: een .cue-bestand met zijn sporen, een .iso of een .chd. De eerste zit bij het aanzetten in de speler; de knop Next CD wisselt naar de volgende.",
 		"slot.floppy": "Diskettes",
-		"slot.floppy.help": "Diskette-images (.d77, .d88, .hdm, .xdf, .img, .mfm). De eerste zit bij het aanzetten in station 1; de knop Next Floppy Disk stopt de volgende in station 1. Wat een spel schrijft, blijft in de machine en haar opgeslagen toestanden, en de bestanden veranderen nooit."
+		"slot.floppy.help": "Diskette-images (.d77, .d88, .hdm, .xdf, .img, .mfm). De eerste zit bij het aanzetten in station 1; de knop Next Floppy Disk stopt de volgende in station 1. Wat een spel schrijft, blijft in de machine en haar opgeslagen toestanden, en de bestanden veranderen nooit.",
+		"tool.blank_floppy": "Lege diskette maken...",
+		"tool.blank_floppy.about": "Maakt een geformatteerde, lege diskette van 1232 KB, zoals FORMAT van Towns OS dat zou doen. Veel spellen slaan op naar een eigen schijf van de speler en vragen om een lege: voeg de gemaakte schijf toe aan het diskettevak van het project.",
+		"tool.blank_floppy.disk": "Lege schijf",
+		"tool.blank_floppy.done": "De lege diskette is gemaakt.",
+		"tool.blank_floppy.failed": "De lege diskette kon niet worden geschreven.",
+		"tool.unknown": "Deze core heeft dat hulpmiddel niet."
 	}
 }

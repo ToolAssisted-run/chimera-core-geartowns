@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD-er",
 		"slot.cdrom.help": "CD-bilder: et .cue-ark med sporene sine, en .iso eller en .chd. Den første er i stasjonen ved oppstart; knappen Next CD bytter til den neste.",
 		"slot.floppy": "Disketter",
-		"slot.floppy.help": "Diskettbilder (.d77, .d88, .hdm, .xdf, .img, .mfm). Den første er i stasjon 1 ved oppstart; knappen Next Floppy Disk setter den neste i stasjon 1. Det et spill skriver, blir i maskinen og dens lagrede tilstander, og filene endres aldri."
+		"slot.floppy.help": "Diskettbilder (.d77, .d88, .hdm, .xdf, .img, .mfm). Den første er i stasjon 1 ved oppstart; knappen Next Floppy Disk setter den neste i stasjon 1. Det et spill skriver, blir i maskinen og dens lagrede tilstander, og filene endres aldri.",
+		"tool.blank_floppy": "Lag en tom diskett...",
+		"tool.blank_floppy.about": "Lager en formatert, tom diskett på 1232 KB, slik FORMAT i Towns OS ville gjort. Mange spill lagrer på spillerens egen disk og ber om en tom: legg disken som lages til i prosjektets diskettspor.",
+		"tool.blank_floppy.disk": "Tom disk",
+		"tool.blank_floppy.done": "Den tomme disketten ble laget.",
+		"tool.blank_floppy.failed": "Den tomme disketten kunne ikke skrives.",
+		"tool.unknown": "Denne kjernen har ikke det verktøyet."
 	}
 }

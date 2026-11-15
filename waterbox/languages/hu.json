@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD-k",
 		"slot.cdrom.help": "CD-képfájlok: egy .cue lap a sávjaival, egy .iso vagy egy .chd. Bekapcsoláskor az első van a meghajtóban; a Next CD gomb a következőre vált.",
 		"slot.floppy": "Hajlékonylemezek",
-		"slot.floppy.help": "Hajlékonylemez-képfájlok (.d77, .d88, .hdm, .xdf, .img, .mfm). Bekapcsoláskor az első az 1-es meghajtóban van; a Next Floppy Disk gomb a következőt teszi az 1-es meghajtóba. Amit egy játék ír, a gépben és mentett állapotaiban marad, a fájlok sosem változnak."
+		"slot.floppy.help": "Hajlékonylemez-képfájlok (.d77, .d88, .hdm, .xdf, .img, .mfm). Bekapcsoláskor az első az 1-es meghajtóban van; a Next Floppy Disk gomb a következőt teszi az 1-es meghajtóba. Amit egy játék ír, a gépben és mentett állapotaiban marad, a fájlok sosem változnak.",
+		"tool.blank_floppy": "Üres floppy készítése...",
+		"tool.blank_floppy.about": "Formázott, üres 1232 KB-os floppyt készít, ahogy a Towns OS FORMAT parancsa tenné. Sok játék a játékos saját lemezére ment, és üreset kér: adja hozzá az elkészült lemezt a projekt floppyhelyéhez.",
+		"tool.blank_floppy.disk": "Üres lemez",
+		"tool.blank_floppy.done": "Az üres floppy elkészült.",
+		"tool.blank_floppy.failed": "Az üres floppyt nem sikerült kiírni.",
+		"tool.unknown": "Ennek a magnak nincs ilyen eszköze."
 	}
 }

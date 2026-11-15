@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Images de CD : une feuille .cue avec ses pistes, un .iso ou un .chd. Le premier est dans le lecteur à l'allumage ; le bouton Next CD passe au suivant.",
 		"slot.floppy": "Disquettes",
-		"slot.floppy.help": "Images de disquette (.d77, .d88, .hdm, .xdf, .img, .mfm). La première est dans le lecteur 1 à l'allumage ; le bouton Next Floppy Disk met la suivante dans le lecteur 1. Ce qu'un jeu écrit reste dans la machine et ses sauvegardes d'état, et les fichiers ne sont jamais modifiés."
+		"slot.floppy.help": "Images de disquette (.d77, .d88, .hdm, .xdf, .img, .mfm). La première est dans le lecteur 1 à l'allumage ; le bouton Next Floppy Disk met la suivante dans le lecteur 1. Ce qu'un jeu écrit reste dans la machine et ses sauvegardes d'état, et les fichiers ne sont jamais modifiés.",
+		"tool.blank_floppy": "Créer une disquette vierge...",
+		"tool.blank_floppy.about": "Crée une disquette de 1232 Ko formatée et vide, comme le ferait FORMAT de Towns OS. Beaucoup de jeux sauvegardent sur un disque du joueur et en demandent un vierge : ajoutez le disque créé à l'emplacement des disquettes du projet.",
+		"tool.blank_floppy.disk": "Disque vierge",
+		"tool.blank_floppy.done": "La disquette vierge a été créée.",
+		"tool.blank_floppy.failed": "La disquette vierge n'a pas pu être écrite.",
+		"tool.unknown": "Ce cœur n'a pas cet outil."
 	}
 }

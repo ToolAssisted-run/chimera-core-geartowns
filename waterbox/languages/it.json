@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Immagini di CD: un foglio .cue con le sue tracce, un .iso o un .chd. Il primo è nel lettore all'accensione; il pulsante Next CD passa al successivo.",
 		"slot.floppy": "Dischetti",
-		"slot.floppy.help": "Immagini di dischetto (.d77, .d88, .hdm, .xdf, .img, .mfm). Il primo è nell'unità 1 all'accensione; il pulsante Next Floppy Disk mette il successivo nell'unità 1. Ciò che un gioco scrive resta nella macchina e nei suoi stati salvati, e i file non vengono mai modificati."
+		"slot.floppy.help": "Immagini di dischetto (.d77, .d88, .hdm, .xdf, .img, .mfm). Il primo è nell'unità 1 all'accensione; il pulsante Next Floppy Disk mette il successivo nell'unità 1. Ciò che un gioco scrive resta nella macchina e nei suoi stati salvati, e i file non vengono mai modificati.",
+		"tool.blank_floppy": "Crea un floppy vuoto...",
+		"tool.blank_floppy.about": "Crea un floppy da 1232 KB formattato e vuoto, come farebbe FORMAT di Towns OS. Molti giochi salvano su un disco del giocatore e ne chiedono uno vuoto: aggiungi il disco creato allo slot dei floppy del progetto.",
+		"tool.blank_floppy.disk": "Disco vuoto",
+		"tool.blank_floppy.done": "Il floppy vuoto è stato creato.",
+		"tool.blank_floppy.failed": "Impossibile scrivere il floppy vuoto.",
+		"tool.unknown": "Questo core non ha questo strumento."
 	}
 }

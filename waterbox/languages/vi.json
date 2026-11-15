@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Ảnh CD: một tệp .cue kèm các rãnh của nó, một .iso hoặc một .chd. Khi bật máy, đĩa đầu tiên ở trong ổ; nút Next CD đổi sang đĩa tiếp theo.",
 		"slot.floppy": "Đĩa mềm",
-		"slot.floppy.help": "Ảnh đĩa mềm (.d77, .d88, .hdm, .xdf, .img, .mfm). Khi bật máy, đĩa đầu tiên ở ổ 1; nút Next Floppy Disk đưa đĩa tiếp theo vào ổ 1. Những gì trò chơi ghi lại nằm trong máy và các trạng thái lưu của nó, còn các tệp không bao giờ bị thay đổi."
+		"slot.floppy.help": "Ảnh đĩa mềm (.d77, .d88, .hdm, .xdf, .img, .mfm). Khi bật máy, đĩa đầu tiên ở ổ 1; nút Next Floppy Disk đưa đĩa tiếp theo vào ổ 1. Những gì trò chơi ghi lại nằm trong máy và các trạng thái lưu của nó, còn các tệp không bao giờ bị thay đổi.",
+		"tool.blank_floppy": "Tạo đĩa mềm trống...",
+		"tool.blank_floppy.about": "Tạo một đĩa mềm 1232 KB đã định dạng và trống, như lệnh FORMAT của Towns OS. Nhiều trò chơi lưu vào đĩa riêng của người chơi và yêu cầu một đĩa trống: hãy thêm đĩa vừa tạo vào khe đĩa mềm của dự án.",
+		"tool.blank_floppy.disk": "Đĩa trống",
+		"tool.blank_floppy.done": "Đã tạo đĩa mềm trống.",
+		"tool.blank_floppy.failed": "Không thể ghi đĩa mềm trống.",
+		"tool.unknown": "Lõi này không có công cụ đó."
 	}
 }

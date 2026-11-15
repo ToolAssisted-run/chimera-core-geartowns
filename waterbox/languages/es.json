@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Imágenes de CD: una hoja .cue con sus pistas, un .iso o un .chd. El primero está en la unidad al encender; el botón Next CD cambia al siguiente.",
 		"slot.floppy": "Disquetes",
-		"slot.floppy.help": "Imágenes de disquete (.d77, .d88, .hdm, .xdf, .img, .mfm). El primero está en la unidad 1 al encender; el botón Next Floppy Disk pone el siguiente en la unidad 1. Lo que escribe un juego queda en la máquina y en sus estados guardados, y los archivos nunca cambian."
+		"slot.floppy.help": "Imágenes de disquete (.d77, .d88, .hdm, .xdf, .img, .mfm). El primero está en la unidad 1 al encender; el botón Next Floppy Disk pone el siguiente en la unidad 1. Lo que escribe un juego queda en la máquina y en sus estados guardados, y los archivos nunca cambian.",
+		"tool.blank_floppy": "Crear un disquete en blanco...",
+		"tool.blank_floppy.about": "Crea un disquete de 1232 KB formateado y vacío, como lo haría el FORMAT de Towns OS. Muchos juegos guardan la partida en un disco del jugador y piden uno en blanco: añada el disco creado a la ranura de disquetes del proyecto.",
+		"tool.blank_floppy.disk": "Disco en blanco",
+		"tool.blank_floppy.done": "Se ha creado el disquete en blanco.",
+		"tool.blank_floppy.failed": "No se pudo escribir el disquete en blanco.",
+		"tool.unknown": "Este núcleo no tiene esa herramienta."
 	}
 }

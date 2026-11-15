@@ -309,8 +309,31 @@ if [ -n "${CHIMERA_ROOT:-}" ] && [ -x "$runner" ] && [ -f "$package" ]; then
 	else
 		report "engine:input-polls" FAIL "inputPolls=${polls:-missing} frames=${frames:-?} lagFrames=${lags:-?}; $(tail -1 "$work/polls.log" 2> /dev/null)"
 	fi
+
+	# the core's own tool, Make a Blank Floppy Disk: a 1232 KB (2HD) D88
+	# image, formatted - all 154 tracks of eight 1024-byte sectors, a boot
+	# sector and an empty file table - which the core takes in drive 1 like
+	# any floppy (the test program reads the drive's status)
+	rm -f "$work/blank.d88"
+	"$runner" --run-tool blank_floppy "$package" --output "disk=$work/blank.d88" > "$work/tool.log" 2>&1
+	d88="$(python3 -c "
+import struct,sys
+d=open(sys.argv[1],'rb').read()
+t0=struct.unpack_from('<I',d,0x20)[0] if len(d)>0x2B0 else 0
+ok=(len(d)==0x2B0+154*8*(16+1024) and d[0x1B]==0x20 and struct.unpack_from('<I',d,0x1C)[0]==len(d)
+    and d[0:8]==b'USERDISK' and d[t0+16:t0+20]==b'IPL4' and d[t0+16+1040:t0+16+1043]==bytes((0xFE,0xFF,0xFF)))
+print('ok' if ok else 'bad')" "$work/blank.d88" 2>/dev/null)"
+	if [ "$d88" != ok ]; then
+		report "tool:blank-floppy" FAIL "no formatted 2HD D88 image made: $(tail -1 "$work/tool.log")"
+	else
+		wd="$(workdir blankfd '{"model":"model1_2"}')"
+		cp "$work/blank.d88" "$wd/"
+		printf '{"floppy":["blank.d88"]}' > "$wd/slots"
+		media_leg "tool:blank-floppy" "$wd" "$work/idle.txt"
+	fi
 else
 	printf "%-26s %-6s %s\n" "engine:input-polls" SKIP "needs CHIMERA_ROOT with build/dll/chimera-run and build/Cores/geartowns.chimeraCore"
+	printf "%-26s %-6s %s\n" "tool:blank-floppy" SKIP "needs CHIMERA_ROOT, as above"
 fi
 
 echo ""

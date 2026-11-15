@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD-levyt",
 		"slot.cdrom.help": "CD-levykuvat: .cue-tiedosto raitoineen, .iso tai .chd. Ensimmäinen on asemassa käynnistettäessä; Next CD -painike vaihtaa seuraavaan.",
 		"slot.floppy": "Levykkeet",
-		"slot.floppy.help": "Levykekuvat (.d77, .d88, .hdm, .xdf, .img, .mfm). Ensimmäinen on asemassa 1 käynnistettäessä; Next Floppy Disk -painike laittaa seuraavan asemaan 1. Mitä peli kirjoittaa, jää koneeseen ja sen tallennustiloihin, eikä tiedostoja koskaan muuteta."
+		"slot.floppy.help": "Levykekuvat (.d77, .d88, .hdm, .xdf, .img, .mfm). Ensimmäinen on asemassa 1 käynnistettäessä; Next Floppy Disk -painike laittaa seuraavan asemaan 1. Mitä peli kirjoittaa, jää koneeseen ja sen tallennustiloihin, eikä tiedostoja koskaan muuteta.",
+		"tool.blank_floppy": "Tee tyhjä levyke...",
+		"tool.blank_floppy.about": "Tekee alustetun, tyhjän 1232 kt:n levykkeen, kuten Towns OS:n FORMAT tekisi. Monet pelit tallentavat pelaajan omalle levylle ja pyytävät tyhjää: lisää tehty levy projektin levykepaikkaan.",
+		"tool.blank_floppy.disk": "Tyhjä levy",
+		"tool.blank_floppy.done": "Tyhjä levyke tehtiin.",
+		"tool.blank_floppy.failed": "Tyhjää levykettä ei voitu kirjoittaa.",
+		"tool.unknown": "Tässä ytimessä ei ole tällaista työkalua."
 	}
 }

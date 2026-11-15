@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Imatges de CD: un full .cue amb les seves pistes, un .iso o un .chd. El primer és a la unitat en engegar; el botó Next CD canvia al següent.",
 		"slot.floppy": "Disquets",
-		"slot.floppy.help": "Imatges de disquet (.d77, .d88, .hdm, .xdf, .img, .mfm). El primer és a la unitat 1 en engegar; el botó Next Floppy Disk posa el següent a la unitat 1. El que escriu un joc queda a la màquina i als seus estats desats, i els fitxers no canvien mai."
+		"slot.floppy.help": "Imatges de disquet (.d77, .d88, .hdm, .xdf, .img, .mfm). El primer és a la unitat 1 en engegar; el botó Next Floppy Disk posa el següent a la unitat 1. El que escriu un joc queda a la màquina i als seus estats desats, i els fitxers no canvien mai.",
+		"tool.blank_floppy": "Crea un disquet en blanc...",
+		"tool.blank_floppy.about": "Crea un disquet de 1232 KB formatat i buit, com ho faria el FORMAT de Towns OS. Molts jocs desen les partides en un disc del jugador i en demanen un de buit: afegiu el disc que es crea a la ranura de disquets del projecte.",
+		"tool.blank_floppy.disk": "Disc en blanc",
+		"tool.blank_floppy.done": "S'ha creat el disquet en blanc.",
+		"tool.blank_floppy.failed": "No s'ha pogut escriure el disquet en blanc.",
+		"tool.unknown": "Aquest nucli no té aquesta eina."
 	}
 }

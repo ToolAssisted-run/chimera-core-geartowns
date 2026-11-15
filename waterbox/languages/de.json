@@ -107,6 +107,12 @@
 		"slot.cdrom": "CDs",
 		"slot.cdrom.help": "CD-Abbilder: eine .cue-Datei mit ihren Spuren, eine .iso oder eine .chd. Die erste liegt beim Einschalten im Laufwerk; die Taste Next CD wechselt zur nächsten.",
 		"slot.floppy": "Disketten",
-		"slot.floppy.help": "Diskettenabbilder (.d77, .d88, .hdm, .xdf, .img, .mfm). Die erste liegt beim Einschalten in Laufwerk 1; die Taste Next Floppy Disk legt die nächste in Laufwerk 1. Was ein Spiel schreibt, bleibt in der Maschine und ihren Speicherständen, und die Dateien werden nie verändert."
+		"slot.floppy.help": "Diskettenabbilder (.d77, .d88, .hdm, .xdf, .img, .mfm). Die erste liegt beim Einschalten in Laufwerk 1; die Taste Next Floppy Disk legt die nächste in Laufwerk 1. Was ein Spiel schreibt, bleibt in der Maschine und ihren Speicherständen, und die Dateien werden nie verändert.",
+		"tool.blank_floppy": "Leere Diskette erstellen...",
+		"tool.blank_floppy.about": "Erstellt eine formatierte, leere 1232-KB-Diskette, wie FORMAT von Towns OS es tun würde. Viele Spiele speichern auf einer eigenen Diskette des Spielers und verlangen eine leere: Fügen Sie die erstellte Diskette dem Diskettenplatz des Projekts hinzu.",
+		"tool.blank_floppy.disk": "Leere Diskette",
+		"tool.blank_floppy.done": "Die leere Diskette wurde erstellt.",
+		"tool.blank_floppy.failed": "Die leere Diskette konnte nicht geschrieben werden.",
+		"tool.unknown": "Dieser Kern hat kein solches Werkzeug."
 	}
 }

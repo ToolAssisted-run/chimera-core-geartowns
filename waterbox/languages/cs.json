@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Obrazy CD: soubor .cue s jeho stopami, .iso nebo .chd. První je v mechanice po zapnutí; tlačítko Next CD přepne na další.",
 		"slot.floppy": "Diskety",
-		"slot.floppy.help": "Obrazy disket (.d77, .d88, .hdm, .xdf, .img, .mfm). První je po zapnutí v mechanice 1; tlačítko Next Floppy Disk vloží do mechaniky 1 další. Co hra zapíše, zůstává ve stroji a jeho uložených stavech, a soubory se nikdy nemění."
+		"slot.floppy.help": "Obrazy disket (.d77, .d88, .hdm, .xdf, .img, .mfm). První je po zapnutí v mechanice 1; tlačítko Next Floppy Disk vloží do mechaniky 1 další. Co hra zapíše, zůstává ve stroji a jeho uložených stavech, a soubory se nikdy nemění.",
+		"tool.blank_floppy": "Vytvořit prázdnou disketu...",
+		"tool.blank_floppy.about": "Vytvoří naformátovanou prázdnou disketu 1232 KB, jako by to udělal FORMAT systému Towns OS. Mnoho her ukládá postup na hráčovu vlastní disketu a žádá prázdnou: přidejte vytvořenou disketu do slotu disket v projektu.",
+		"tool.blank_floppy.disk": "Prázdná disketa",
+		"tool.blank_floppy.done": "Prázdná disketa byla vytvořena.",
+		"tool.blank_floppy.failed": "Prázdnou disketu nelze zapsat.",
+		"tool.unknown": "Toto jádro takový nástroj nemá."
 	}
 }

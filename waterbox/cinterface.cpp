@@ -532,4 +532,34 @@ ECL_EXPORT const uint8_t *GetSaveDataFileBuffer(int32_t i)
 	return i == 0 && g_core ? g_core->GetMemory()->GetCMOS() : NULL;
 }
 
+/* ---------------------------------------------------------------- tools
+ * Called instead of Init, with no machine (Chimera docs/project.md, "A
+ * core's own tools"). blank_floppy writes a formatted, empty 1232 KB disk,
+ * Geartowns' own blank (FloppyImage::CreateBlank, as its libretro core makes
+ * a save disk), to the output "disk". Games that keep saves on a disk of the
+ * player's own ask for one, and some do not take an unformatted one. */
+ECL_EXPORT const char *RunTool(void)
+{
+	static char req[4096];
+	FILE *r = fopen("tool", "rb");
+	size_t n = r ? fread(req, 1, sizeof req - 1, r) : 0;
+	if (r)
+		fclose(r);
+	req[n] = 0;
+	if (!strstr(req, "\"tool\":\"blank_floppy\""))
+		return "{\"refused\": \"tool.unknown\"}";
+
+	u32 size = 0;
+	u8 *image = FloppyImage::CreateBlank(FLOPPY_BLANK_2HD_1232, true, &size);
+	if (!image)
+		return "{\"refused\": \"tool.blank_floppy.failed\"}";
+	FloppyImage::SetDiskName(image, size, "USERDISK");
+	FILE *out = fopen("disk", "wb");
+	bool ok = out && fwrite(image, 1, size, out) == size;
+	if (out)
+		ok = fclose(out) == 0 && ok;
+	delete[] image;
+	return ok ? "{\"done\": \"tool.blank_floppy.done\"}" : "{\"refused\": \"tool.blank_floppy.failed\"}";
+}
+
 } /* extern "C" */

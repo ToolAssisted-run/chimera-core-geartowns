@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "CD 映像：带音轨的 .cue 文件、.iso 或 .chd。开机时第一张在光驱中；Next CD 按钮换到下一张。",
 		"slot.floppy": "软盘",
-		"slot.floppy.help": "软盘映像（.d77、.d88、.hdm、.xdf、.img、.mfm）。开机时第一张在 1 号驱动器中；Next Floppy Disk 按钮把下一张放进 1 号驱动器。游戏写入的内容留在机器及其即时存档中，文件不会被改动。"
+		"slot.floppy.help": "软盘映像（.d77、.d88、.hdm、.xdf、.img、.mfm）。开机时第一张在 1 号驱动器中；Next Floppy Disk 按钮把下一张放进 1 号驱动器。游戏写入的内容留在机器及其即时存档中，文件不会被改动。",
+		"tool.blank_floppy": "制作空白软盘...",
+		"tool.blank_floppy.about": "像 Towns OS 的 FORMAT 一样，制作一张已格式化的空白 1232 KB 软盘。许多游戏把存档写在玩家自己的磁盘上并要求一张空白盘：请把制作的磁盘加入项目的软盘槽。",
+		"tool.blank_floppy.disk": "空白磁盘",
+		"tool.blank_floppy.done": "空白软盘已制作。",
+		"tool.blank_floppy.failed": "无法写入空白软盘。",
+		"tool.unknown": "此核心没有该工具。"
 	}
 }

@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "CD 映像：帶音軌的 .cue 檔、.iso 或 .chd。開機時第一張在光碟機中；Next CD 按鈕換到下一張。",
 		"slot.floppy": "磁片",
-		"slot.floppy.help": "磁片映像（.d77、.d88、.hdm、.xdf、.img、.mfm）。開機時第一張在 1 號磁碟機中；Next Floppy Disk 按鈕把下一張放進 1 號磁碟機。遊戲寫入的內容留在機器及其即時存檔中，檔案不會被改動。"
+		"slot.floppy.help": "磁片映像（.d77、.d88、.hdm、.xdf、.img、.mfm）。開機時第一張在 1 號磁碟機中；Next Floppy Disk 按鈕把下一張放進 1 號磁碟機。遊戲寫入的內容留在機器及其即時存檔中，檔案不會被改動。",
+		"tool.blank_floppy": "製作空白磁碟片...",
+		"tool.blank_floppy.about": "像 Towns OS 的 FORMAT 一樣，製作一張已格式化的空白 1232 KB 磁碟片。許多遊戲把存檔寫在玩家自己的磁碟上並要求一張空白磁碟：請把製作的磁碟加入專案的磁碟片槽。",
+		"tool.blank_floppy.disk": "空白磁碟",
+		"tool.blank_floppy.done": "空白磁碟片已製作。",
+		"tool.blank_floppy.failed": "無法寫入空白磁碟片。",
+		"tool.unknown": "此核心沒有該工具。"
 	}
 }

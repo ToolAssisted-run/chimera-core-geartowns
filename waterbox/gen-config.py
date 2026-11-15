@@ -221,6 +221,19 @@ def config(ks):
         "extensions": {e: "FMTowns" for e in [".cue", ".iso", ".chd", ".d77", ".d88", ".hdm", ".xdf", ".mfm"]},
         "settings": settings(),
         "firmware": firmware(),
+        # Many games keep their saves on a floppy of the player's own (a
+        # "user disk" or "save disk") and ask for a blank one. This makes one,
+        # as Towns OS's FORMAT would: a 1232 KB (2HD) disk, formatted and
+        # empty, written as a .d88 image the person then adds to the
+        # project's floppy slot.
+        "tools": [{
+            "id": "blank_floppy",
+            "menu": "tool.blank_floppy",
+            "description": "tool.blank_floppy.about",
+            "inputs": [],
+            "options": [],
+            "outputs": [{"name": "disk", "label": "tool.blank_floppy.disk", "extension": "d88"}],
+        }],
     }
 
 

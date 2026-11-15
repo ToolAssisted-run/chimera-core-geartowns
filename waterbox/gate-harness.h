@@ -64,7 +64,42 @@ struct gate_opts
 	long pressAt;                 /* press one wire index at one frame, for a few frames */
 	int pressIndex;
 	long digestFrom;              /* the picture and sound digests start at this frame */
+	const char *shotsDir;         /* a picture every shotsEvery frames, as <dir>/f<frame>.tga */
+	long shotsEvery;
+	const char *scriptPath;       /* lines "<first> <last> <wire index>" or "<first> <last> m <dx> <dy>" */
 };
+
+/* the --script file: each line holds one wire index over a span of frames,
+ * or ("m") moves the mouse by dx, dy counts on each of those frames */
+struct gate_span { long from, to; int index, dx, dy; };
+static struct gate_span *gate_spans;
+static int gate_span_count;
+
+static int gate_load_script(const char *path)
+{
+	FILE *f = fopen(path, "r");
+	if (!f) { perror(path); return 0; }
+	char line[256];
+	while (fgets(line, sizeof line, f))
+	{
+		long a, b; int i, dx = 0, dy = 0;
+		if (line[0] == '#')
+			continue;
+		if (sscanf(line, "%ld %ld m %d %d", &a, &b, &dx, &dy) == 4)
+			i = -1;
+		else if (sscanf(line, "%ld %ld %d", &a, &b, &i) != 3)
+			continue;
+		gate_spans = (struct gate_span *)realloc(gate_spans, sizeof *gate_spans * (size_t)(gate_span_count + 1));
+		gate_spans[gate_span_count].from = a;
+		gate_spans[gate_span_count].to = b;
+		gate_spans[gate_span_count].index = i;
+		gate_spans[gate_span_count].dx = dx;
+		gate_spans[gate_span_count].dy = dy;
+		gate_span_count++;
+	}
+	fclose(f);
+	return 1;
+}
 
 static uint64_t gate_fnv(uint64_t h, const void *p, size_t n)
 {
@@ -139,6 +174,9 @@ static int gate_run(const struct gate_core *c, const struct gate_opts *o)
 		}
 	}
 
+	if (o->scriptPath && !gate_load_script(o->scriptPath))
+		return 1;
+
 	const long frames = o->frames;
 	const long tail = frames / 2;
 	const long hashFrom = tail + o->turboSettle;
@@ -156,6 +194,18 @@ static int gate_run(const struct gate_core *c, const struct gate_opts *o)
 			gate_exercise(f, buttons, axes);
 		if (o->pressIndex >= 0 && f >= o->pressAt && f < o->pressAt + 4)
 			buttons[o->pressIndex] = 1;
+		for (int s = 0; s < gate_span_count; s++)
+		{
+			if (f < gate_spans[s].from || f > gate_spans[s].to)
+				continue;
+			if (gate_spans[s].index >= 0 && gate_spans[s].index < GATE_BTN_COUNT)
+				buttons[gate_spans[s].index] = 1;
+			else if (gate_spans[s].index < 0)
+			{
+				axes[0] += gate_spans[s].dx;
+				axes[1] += gate_spans[s].dy;
+			}
+		}
 
 		if (o->turbo && c->set_rendering)
 			c->set_rendering(f >= tail);
@@ -199,6 +249,12 @@ static int gate_run(const struct gate_core *c, const struct gate_opts *o)
 		if (!c->input_was_read())
 			lag++;
 
+		if (o->shotsDir && o->shotsEvery > 0 && (f + 1) % o->shotsEvery == 0)
+		{
+			char path[4096];
+			snprintf(path, sizeof path, "%s/f%06ld.tga", o->shotsDir, f + 1);
+			gate_write_tga(path, video, w, h);
+		}
 		if (o->screenshotPath && f == frames - 1)
 			gate_write_tga(o->screenshotPath, video, w, h);
 		if (f == frames - 1)
@@ -271,6 +327,8 @@ static int gate_parse_opts(int argc, char **argv, int first, struct gate_opts *o
 		else if (!strcmp(argv[i], "--digest-from") && i + 1 < argc) o->digestFrom = strtol(argv[++i], 0, 0);
 		else if (!strcmp(argv[i], "--dump-domain") && i + 2 < argc) { o->dumpDomain = argv[++i]; o->dumpPath = argv[++i]; }
 		else if (!strcmp(argv[i], "--savedata-out") && i + 1 < argc) o->savedataDir = argv[++i];
+		else if (!strcmp(argv[i], "--shots") && i + 2 < argc) { o->shotsDir = argv[++i]; o->shotsEvery = strtol(argv[++i], 0, 0); }
+		else if (!strcmp(argv[i], "--script") && i + 1 < argc) o->scriptPath = argv[++i];
 		else if (!strcmp(argv[i], "--turbo")) o->turbo = 1;
 		else if (!strcmp(argv[i], "--turbo-settle") && i + 1 < argc) o->turboSettle = strtol(argv[++i], 0, 0);
 		else if (!strcmp(argv[i], "--rerecord")) ; /* run-wbx's */

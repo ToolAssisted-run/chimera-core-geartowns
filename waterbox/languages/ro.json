@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD-uri",
 		"slot.cdrom.help": "Imagini CD: o foaie .cue cu pistele ei, un .iso sau un .chd. Primul este în unitate la pornire; butonul Next CD trece la următorul.",
 		"slot.floppy": "Dischete",
-		"slot.floppy.help": "Imagini de dischetă (.d77, .d88, .hdm, .xdf, .img, .mfm). Prima este în unitatea 1 la pornire; butonul Next Floppy Disk pune următoarea în unitatea 1. Ce scrie un joc rămâne în mașină și în stările ei salvate, iar fișierele nu se schimbă niciodată."
+		"slot.floppy.help": "Imagini de dischetă (.d77, .d88, .hdm, .xdf, .img, .mfm). Prima este în unitatea 1 la pornire; butonul Next Floppy Disk pune următoarea în unitatea 1. Ce scrie un joc rămâne în mașină și în stările ei salvate, iar fișierele nu se schimbă niciodată.",
+		"tool.blank_floppy": "Creează o dischetă goală...",
+		"tool.blank_floppy.about": "Creează o dischetă de 1232 KB formatată și goală, așa cum ar face FORMAT din Towns OS. Multe jocuri salvează pe un disc al jucătorului și cer unul gol: adăugați discul creat în slotul de dischete al proiectului.",
+		"tool.blank_floppy.disk": "Disc gol",
+		"tool.blank_floppy.done": "Discheta goală a fost creată.",
+		"tool.blank_floppy.failed": "Discheta goală nu a putut fi scrisă.",
+		"tool.unknown": "Acest nucleu nu are un astfel de instrument."
 	}
 }

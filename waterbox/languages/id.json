@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD",
 		"slot.cdrom.help": "Image CD: lembar .cue beserta trek-treknya, .iso, atau .chd. Yang pertama ada di drive saat dinyalakan; tombol Next CD berganti ke berikutnya.",
 		"slot.floppy": "Disket",
-		"slot.floppy.help": "Image disket (.d77, .d88, .hdm, .xdf, .img, .mfm). Yang pertama ada di drive 1 saat dinyalakan; tombol Next Floppy Disk memasukkan yang berikutnya ke drive 1. Apa yang ditulis permainan tetap di mesin dan keadaan simpanannya, dan berkasnya tidak pernah berubah."
+		"slot.floppy.help": "Image disket (.d77, .d88, .hdm, .xdf, .img, .mfm). Yang pertama ada di drive 1 saat dinyalakan; tombol Next Floppy Disk memasukkan yang berikutnya ke drive 1. Apa yang ditulis permainan tetap di mesin dan keadaan simpanannya, dan berkasnya tidak pernah berubah.",
+		"tool.blank_floppy": "Buat Disket Kosong...",
+		"tool.blank_floppy.about": "Membuat disket 1232 KB yang sudah diformat dan kosong, seperti FORMAT milik Towns OS. Banyak game menyimpan data di disk milik pemain dan meminta disk kosong: tambahkan disk yang dibuat ke slot disket proyek.",
+		"tool.blank_floppy.disk": "Disk kosong",
+		"tool.blank_floppy.done": "Disket kosong sudah dibuat.",
+		"tool.blank_floppy.failed": "Disket kosong tidak dapat ditulis.",
+		"tool.unknown": "Core ini tidak punya alat tersebut."
 	}
 }

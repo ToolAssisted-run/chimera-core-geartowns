@@ -107,6 +107,12 @@
 		"slot.cdrom": "CDs",
 		"slot.cdrom.help": "CD images: a .cue sheet with its tracks, an .iso or a .chd. The first is in the drive at power on; the Next CD button changes to the next one.",
 		"slot.floppy": "Floppy disks",
-		"slot.floppy.help": "Floppy disk images (.d77, .d88, .hdm, .xdf, .img, .mfm). The first is in drive 1 at power on; the Next Floppy Disk button puts the next one in drive 1. What a game writes stays in the machine and its savestates, and the files are never changed."
+		"slot.floppy.help": "Floppy disk images (.d77, .d88, .hdm, .xdf, .img, .mfm). The first is in drive 1 at power on; the Next Floppy Disk button puts the next one in drive 1. What a game writes stays in the machine and its savestates, and the files are never changed.",
+		"tool.blank_floppy": "Make a Blank Floppy Disk...",
+		"tool.blank_floppy.about": "Makes a formatted, empty 1232 KB floppy disk, as Towns OS's FORMAT would. Many games keep their saves on a disk of the player's own and ask for a blank one: add the disk this makes to the project's floppy slot.",
+		"tool.blank_floppy.disk": "Blank disk",
+		"tool.blank_floppy.done": "The blank floppy disk was made.",
+		"tool.blank_floppy.failed": "The blank floppy disk could not be written.",
+		"tool.unknown": "This core has no such tool."
 	}
 }

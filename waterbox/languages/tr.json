@@ -107,6 +107,12 @@
 		"slot.cdrom": "CD'ler",
 		"slot.cdrom.help": "CD kalıpları: izleriyle birlikte bir .cue sayfası, bir .iso ya da bir .chd. Açılışta ilki sürücüdedir; Next CD düğmesi sonrakine geçer.",
 		"slot.floppy": "Disketler",
-		"slot.floppy.help": "Disket kalıpları (.d77, .d88, .hdm, .xdf, .img, .mfm). Açılışta ilki 1. sürücüdedir; Next Floppy Disk düğmesi sonrakini 1. sürücüye takar. Bir oyunun yazdıkları makinede ve kayıtlı durumlarında kalır, dosyalar hiç değişmez."
+		"slot.floppy.help": "Disket kalıpları (.d77, .d88, .hdm, .xdf, .img, .mfm). Açılışta ilki 1. sürücüdedir; Next Floppy Disk düğmesi sonrakini 1. sürücüye takar. Bir oyunun yazdıkları makinede ve kayıtlı durumlarında kalır, dosyalar hiç değişmez.",
+		"tool.blank_floppy": "Boş disket oluştur...",
+		"tool.blank_floppy.about": "Towns OS'un FORMAT komutunun yapacağı gibi biçimlendirilmiş, boş bir 1232 KB disket oluşturur. Birçok oyun kayıtlarını oyuncunun kendi diskine yazar ve boş bir disk ister: oluşturulan diski projenin disket yuvasına ekleyin.",
+		"tool.blank_floppy.disk": "Boş disk",
+		"tool.blank_floppy.done": "Boş disket oluşturuldu.",
+		"tool.blank_floppy.failed": "Boş disket yazılamadı.",
+		"tool.unknown": "Bu çekirdeğin böyle bir aracı yok."
 	}
 }

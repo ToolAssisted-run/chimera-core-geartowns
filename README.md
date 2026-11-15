@@ -19,7 +19,9 @@ beside Chimera's program (Tools > Core Manager... lists that folder).
 
 A project holds CDs (`.cue` with its tracks, `.iso`, `.chd`), floppy disks
 (`.d77`, `.d88`, `.hdm`, `.xdf`, `.img`, `.mfm`), or both. The machine also
-starts with neither.
+starts with neither. Many games save to a blank floppy of the player's own:
+Tools > Core-Specific Tools > Geartowns > Make a Blank Floppy Disk makes one
+to add to the project's floppy slot.
 
 ## What you bring
 

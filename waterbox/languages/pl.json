@@ -107,6 +107,12 @@
 		"slot.cdrom": "Płyty CD",
 		"slot.cdrom.help": "Obrazy CD: arkusz .cue z jego ścieżkami, .iso lub .chd. Pierwszy jest w napędzie po włączeniu; przycisk Next CD zmienia na następny.",
 		"slot.floppy": "Dyskietki",
-		"slot.floppy.help": "Obrazy dyskietek (.d77, .d88, .hdm, .xdf, .img, .mfm). Pierwsza jest w napędzie 1 po włączeniu; przycisk Next Floppy Disk wkłada następną do napędu 1. To, co zapisze gra, zostaje w maszynie i jej zapisanych stanach, a pliki nigdy się nie zmieniają."
+		"slot.floppy.help": "Obrazy dyskietek (.d77, .d88, .hdm, .xdf, .img, .mfm). Pierwsza jest w napędzie 1 po włączeniu; przycisk Next Floppy Disk wkłada następną do napędu 1. To, co zapisze gra, zostaje w maszynie i jej zapisanych stanach, a pliki nigdy się nie zmieniają.",
+		"tool.blank_floppy": "Utwórz pustą dyskietkę...",
+		"tool.blank_floppy.about": "Tworzy sformatowaną, pustą dyskietkę 1232 KB, tak jak zrobiłby to FORMAT systemu Towns OS. Wiele gier zapisuje stan na własnym dysku gracza i prosi o pusty: dodaj utworzony dysk do gniazda dyskietek projektu.",
+		"tool.blank_floppy.disk": "Pusty dysk",
+		"tool.blank_floppy.done": "Pusta dyskietka została utworzona.",
+		"tool.blank_floppy.failed": "Nie udało się zapisać pustej dyskietki.",
+		"tool.unknown": "Ten rdzeń nie ma takiego narzędzia."
 	}
 }

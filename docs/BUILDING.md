@@ -111,6 +111,33 @@ must equal the native reference's with nothing pressed, with a pad held
 through Lua, and on the HR; and the package's key bindings must be the
 machine's. Its files are in `waterbox/tests/work/`.
 
+### Trying a real game
+
+No test runs Fujitsu's ROMs or a game: they may not be passed on. To try
+one by hand, make a folder under `tests/roms-local/` (ignored by git) and
+copy into it the firmware files by the names the package asks for, the
+game's `.cue` with its tracks, and a blank floppy if the game saves to one.
+Then write the two files Chimera would mount, `settings` and `slots`:
+
+```
+printf '{"model":"mx"}' > settings
+printf '{"cdrom":["Game.cue"],"floppy":["blank.d88"]}' > slots
+build/meson-native/run-native <folder> --frames 20000 --shots /tmp/shots 300 --script input.txt
+build/meson-native/run-wbx build/meson-guest/core.wbx <folder> --frames 20000 --script input.txt
+```
+
+`--shots <dir> <n>` writes the picture every n frames as a `.tga`.
+`--script <file>` holds input: a line `<first> <last> <wire index>` holds
+one control on those frames (the index is the control's place in
+`waterbox.config`'s `input.buttons`, counting from 0), and a line
+`<first> <last> m <dx> <dy>` moves the mouse on each of them. Both runners
+print the same digests, so the two can be compared.
+
+A blank floppy comes from the core's own tool: in Chimera's window, Tools >
+Core-Specific Tools > Geartowns > Make a Blank Floppy Disk, or from a shell,
+`chimera-run --run-tool blank_floppy <package> --output disk=blank.d88`.
+`docs/PLAN.md` says which games were tried and how far they got.
+
 ## What CI does
 
 `.github/workflows/chimera.yml`, on x86_64 (`ubuntu-24.04`) and aarch64
