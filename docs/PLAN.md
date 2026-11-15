@@ -148,8 +148,8 @@ of it is in the package.
   written. A CD is read from its file as the machine asks (the file does not
   change, and Geartowns keeps what it read in its own memory).
 - **The save disk** (owner, 2026-11-15) is upstream's libretro "Save Disk"
-  option built into the machine: with the `saveDisk` setting on (off by
-  default, as upstream's), the core makes Geartowns' formatted blank 1232 KB
+  option built into the machine: with the `saveDisk` setting on (on by
+  default, where upstream's is off; owner, 2026-11-15), the core makes Geartowns' formatted blank 1232 KB
   floppy in Init, before the seal, and adds it to the end of the floppy list,
   after the project's own floppies. Like upstream's, it is not in a drive at
   power on: Next Floppy Disk puts it in drive 1. It lives in the machine's
@@ -167,7 +167,7 @@ of it is in the package.
 
 ## 3. Tests
 
-`waterbox/run-gate.sh` (needs nasm; 49 checks with `CHIMERA_ROOT` and
+`waterbox/run-gate.sh` (needs nasm; 50 checks with `CHIMERA_ROOT` and
 `GEARTOWNS_COMPAT_ROM_SRC`, about 2 minutes on jaffanator01):
 
 - every model (14): native == sandbox over 300 frames of a fixed schedule of
@@ -184,11 +184,12 @@ of it is in the package.
   drive's status); Next Floppy Disk puts in the second, write-protected
   disk; and the compatible ROM boots our boot program from a CD, which notes
   that it came from the CD. Each native == sandbox == savestate every frame.
-- the save disk and save data: with `saveDisk` on, the export holds
+- the save disk and save data: with no setting given, the export holds
   `CMOS.RAM` and a formatted 2HD `SAVEDISK.d88`, the same from both builds,
-  and without it the CMOS alone; the disk is not in drive 1 at power on;
-  Next Floppy Disk puts it there (native == sandbox == savestate every
-  frame); a zip of a changed CMOS and a changed disk in the save data slot
+  and with `saveDisk` off the CMOS alone; the disk is not in drive 1 at
+  power on; Next Floppy Disk puts it there (native == sandbox == savestate
+  every frame); a project's own two floppies go in first, and the save disk
+  only on the press after them; a zip of a changed CMOS and a changed disk in the save data slot
   comes out of the export unchanged after the disk has been in the drive
   (native, sandbox, and a savestate saved and loaded every frame); and a zip
   with a file the core does not know is refused.
@@ -384,3 +385,11 @@ past its first minutes.
   ignored, Next Floppy Disk skipping the save disk), and the export test
   failed for real first: the blank's volume label carried the host's date,
   so the native disk differed. 49 checks pass.
+- 2026-11-15 (later still): the save disk is on by default (owner,
+  2026-11-15), so a game that asks for a user or save disk works without
+  touching a setting: the player presses Next Floppy Disk when it asks.
+  Upstream's option is off by default. The core reads a missing setting as
+  on, as the package declares it. The tests that assumed it off now say
+  `saveDisk` false where they mean it, and a new one checks that a project's
+  own floppies go in before the save disk (seen to fail with the save disk
+  left out of the list). 50 checks pass.

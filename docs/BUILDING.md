@@ -117,11 +117,11 @@ No test runs Fujitsu's ROMs or a game: they may not be passed on. To try
 one by hand, make a folder under `tests/roms-local/` (ignored by git) and
 copy into it the firmware files by the names the package asks for and the
 game's `.cue` with its tracks. Then write the two files Chimera would mount,
-`settings` and `slots` (`saveDisk` gives the machine its own blank floppy,
-for a game that saves to one):
+`settings` and `slots` (the machine has its own blank floppy, the save
+disk, unless `saveDisk` is false):
 
 ```
-printf '{"model":"mx","saveDisk":true}' > settings
+printf '{"model":"mx"}' > settings
 printf '{"cdrom":["Game.cue"]}' > slots
 build/meson-native/run-native <folder> --frames 20000 --shots /tmp/shots 300 --script input.txt
 build/meson-native/run-wbx build/meson-guest/core.wbx <folder> --frames 20000 --script input.txt

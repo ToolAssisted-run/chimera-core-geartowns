@@ -178,7 +178,7 @@ def settings():
         setting("bootDevice", ["auto", "cdrom", "floppy1", "floppy2"], "auto"),
         setting("portA", ports, "auto"),
         setting("portB", ports, "auto"),
-        setting("saveDisk", None, False),
+        setting("saveDisk", None, True),
     ]
 
 

@@ -515,7 +515,7 @@ ECL_EXPORT int Init(void)
 	std::vector<u8> savedCmos, savedDisk;
 	if (!read_save_data(savedCmos, savedDisk))
 		return 0;
-	g_hasSaveDisk = !savedDisk.empty() || wbx_setting_bool("saveDisk", 0);
+	g_hasSaveDisk = !savedDisk.empty() || wbx_setting_bool("saveDisk", 1);
 	if (!savedDisk.empty())
 		g_saveDisk.swap(savedDisk);
 	else if (g_hasSaveDisk)

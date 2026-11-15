@@ -248,9 +248,10 @@ media_leg "floppy:inserted" "$wd" "$work/idle.txt"
 media_leg "floppy:next-disk" "$wd" "$work/media.floppy:inserted.txt" --press "$(index_of 'Next Floppy Disk')" 100
 
 # ---- the save disk and the save data ----
-# With saveDisk on, the machine has a formatted blank floppy of its own,
-# made inside it: the save data export holds it beside the CMOS, the same
-# from both builds; without the setting the export is the CMOS alone.
+# The machine has a formatted blank floppy of its own, made inside it, unless
+# saveDisk is turned off (it is on by default): the save data export holds
+# it beside the CMOS, the same from both builds; with the setting off the
+# export is the CMOS alone.
 d88check() { python3 -c "
 import struct,sys
 d=open(sys.argv[1],'rb').read()
@@ -258,27 +259,45 @@ t0=struct.unpack_from('<I',d,0x20)[0] if len(d)>0x2B0 else 0
 ok=(len(d)==0x2B0+154*8*(16+1024) and d[0x1B]==0x20 and struct.unpack_from('<I',d,0x1C)[0]==len(d)
     and d[t0+16:t0+20]==b'IPL4' and d[t0+16+1040:t0+16+1043]==bytes((0xFE,0xFF,0xFF)))
 sys.exit(0 if ok else 1)" "$1" 2>/dev/null; }
-sdw="$(workdir savedisk '{"model":"model1_2","saveDisk":true}')"
-rm -rf "$work/sdd.n" "$work/sdd.b" && mkdir -p "$work/sdd.n" "$work/sdd.b"
+sdw="$(workdir savedisk '{"model":"model1_2"}')"
+sdoff="$(workdir savediskoff '{"model":"model1_2","saveDisk":false}')"
+rm -rf "$work/sdd.n" "$work/sdd.b" "$work/sdd.off" && mkdir -p "$work/sdd.n" "$work/sdd.b" "$work/sdd.off"
+"$nat/run-wbx" "$gst/core.wbx" "$sdoff" --frames 60 --savedata-out "$work/sdd.off" > /dev/null 2>&1
 "$nat/run-native" "$sdw" --frames 60 --savedata-out "$work/sdd.n" > /dev/null 2>&1
 "$nat/run-wbx" "$gst/core.wbx" "$sdw" --frames 60 --savedata-out "$work/sdd.b" > /dev/null 2>&1
 names="$(cd "$work/sdd.b" && ls | tr '\n' ' ')"
 if [ "$names" = "CMOS.RAM SAVEDISK.d88 " ] && diff -r "$work/sdd.n" "$work/sdd.b" > /dev/null 2>&1 \
-	&& d88check "$work/sdd.b/SAVEDISK.d88" && [ "$(ls "$work/sd.b" | tr '\n' ' ')" = "CMOS.RAM " ]; then
-	report "savedisk:export" PASS "CMOS.RAM and a formatted 2HD SAVEDISK.d88, native == sandbox; the CMOS alone without it"
+	&& d88check "$work/sdd.b/SAVEDISK.d88" && [ "$(ls "$work/sdd.off" | tr '\n' ' ')" = "CMOS.RAM " ]; then
+	report "savedisk:export" PASS "by default CMOS.RAM and a formatted 2HD SAVEDISK.d88, native == sandbox; the CMOS alone with saveDisk off"
 else
-	report "savedisk:export" FAIL "exported: ${names:-nothing}; without the setting: $(ls "$work/sd.b" | tr '\n' ' ')"
+	report "savedisk:export" FAIL "exported by default: ${names:-nothing}; with saveDisk off: $(ls "$work/sdd.off" | tr '\n' ' ')"
 fi
 
 # Next Floppy Disk puts the save disk in drive 1, which the test program
 # reads the status of; it is not in the drive at power on.
 "$nat/run-wbx" "$gst/core.wbx" "$sdw" --frames "$FRAMES" 2>/dev/null | digests > "$work/sdidle.txt"
-if cmp -s "$work/sdidle.txt" "$work/idle.txt"; then
+"$nat/run-wbx" "$gst/core.wbx" "$sdoff" --frames "$FRAMES" 2>/dev/null | digests > "$work/sdoffidle.txt"
+if [ -s "$work/sdidle.txt" ] && cmp -s "$work/sdidle.txt" "$work/sdoffidle.txt"; then
 	report "savedisk:not-at-power-on" PASS "drive 1 is empty until the disk is chosen"
 else
 	report "savedisk:not-at-power-on" FAIL "the machine with a save disk differs before it is chosen"
 fi
-media_leg "savedisk:next-disk" "$sdw" "$work/idle.txt" --press "$(index_of 'Next Floppy Disk')" 100
+media_leg "savedisk:next-disk" "$sdw" "$work/sdoffidle.txt" --press "$(index_of 'Next Floppy Disk')" 100
+
+# A project's own floppies come first: disk 1 is in drive 1 at power on,
+# Next Floppy Disk puts in disk 2, and only the next press the save disk.
+afw="$(workdir after '{"model":"model1_2"}')"
+cp "$media/disk1.hdm" "$media/disk2.d88" "$afw/"
+printf '{"floppy":["disk1.hdm","disk2.d88"]}' > "$afw/slots"
+nf="$(index_of 'Next Floppy Disk')"
+printf '100 103 %s\n150 153 %s\n' "$nf" "$nf" > "$work/after.script"
+"$nat/run-wbx" "$gst/core.wbx" "$afw" --frames 200 --script "$work/after.script" > /dev/null 2>"$work/after.err"
+order="$(sed -n 's/^\[geartowns\] floppy 1: //p' "$work/after.err" | tr '\n' ',')"
+if [ "$order" = "disk1.hdm,disk2.d88,the save disk," ]; then
+	report "savedisk:after-floppies" PASS "drive 1 takes disk 1, disk 2, then the save disk"
+else
+	report "savedisk:after-floppies" FAIL "drive 1 took: ${order:-nothing}"
+fi
 
 # The save data slot takes back what the export gave: a zip of a CMOS and
 # a disk, each changed so it is not what the machine would make. The save
@@ -295,7 +314,7 @@ with zipfile.ZipFile(out,'w') as z:
 with zipfile.ZipFile(out[:-4]+'-bad.zip','w') as z:
     z.writestr('CMOS.RAM',bytes(c)); z.writestr('OTHER.BIN',b'x')
 " "$work/sdd.b" "$work/taken.zip"
-imw="$(workdir import '{"model":"model1_2"}')"
+imw="$(workdir import '{"model":"model1_2","saveDisk":false}')"
 cp "$work/taken.zip" "$imw/save.zip"
 printf '{"savedata":["save.zip"]}' > "$imw/slots"
 rm -rf "$work/imp" && mkdir -p "$work/imp" && (cd "$work/imp" && python3 -c "import zipfile; zipfile.ZipFile('$work/taken.zip').extractall('.')")

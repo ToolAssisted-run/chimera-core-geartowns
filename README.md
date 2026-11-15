@@ -20,8 +20,9 @@ beside Chimera's program (Tools > Core Manager... lists that folder).
 A project holds CDs (`.cue` with its tracks, `.iso`, `.chd`), floppy disks
 (`.d77`, `.d88`, `.hdm`, `.xdf`, `.img`, `.mfm`), or both. The machine also
 starts with neither. Many games save to a blank floppy of the player's own:
-turn on the "Save disk" setting and the machine has one, which Next Floppy
-Disk puts in drive 1. Export Save Data gives out the machine's CMOS and its
+the machine has one (the "Save disk" setting, on by default). When the game
+asks for it, press Next Floppy Disk, which puts it in drive 1 after the
+project's own floppies. Export Save Data gives out the machine's CMOS and its
 save disk (`CMOS.RAM`, `SAVEDISK.d88`, as a zip), and the project's save
 data slot takes them back.
 
