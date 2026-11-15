@@ -20,8 +20,10 @@ beside Chimera's program (Tools > Core Manager... lists that folder).
 A project holds CDs (`.cue` with its tracks, `.iso`, `.chd`), floppy disks
 (`.d77`, `.d88`, `.hdm`, `.xdf`, `.img`, `.mfm`), or both. The machine also
 starts with neither. Many games save to a blank floppy of the player's own:
-Tools > Core-Specific Tools > Geartowns > Make a Blank Floppy Disk makes one
-to add to the project's floppy slot.
+turn on the "Save disk" setting and the machine has one, which Next Floppy
+Disk puts in drive 1. Export Save Data gives out the machine's CMOS and its
+save disk (`CMOS.RAM`, `SAVEDISK.d88`, as a zip), and the project's save
+data slot takes them back.
 
 ## What you bring
 
@@ -35,12 +37,18 @@ uses one set (Geartowns' BIOS_README.md):
 | 1F/2F, 10F/20F, CX, UX, UG | `fmtownsux` | FMT_SYS.ROM, FMT_DOS.ROM, FMT_FNT.ROM, FMT_DIC.ROM |
 | HG, HR, UR | `fmtownshr` | FMT_SYS.ROM, FMT_DOS.ROM, FMT_FNT.ROM, FMT_DIC.ROM |
 | ME, MA, MX, MF/Fresh | `fmtownsftv` | the four above and FMT_F20.ROM |
-| Marty | `fmtmarty2` | the four above and MAR_EX0.ROM to MAR_EX3.ROM |
+| Marty | `fmtmarty2` | the four above and MAR_EX0.ROM to MAR_EX3.ROM (see below) |
 
 The SHA-1 of each file is in `waterbox/waterbox.config`. The Model 1/2 also
 runs on the free ROMs of the Free FM Towns Project
-(github.com/captainys/FreeTOWNSOS, folder CompROM): turn on the
-"Free FM Towns ROMs" setting. Many games do not run on them.
+(github.com/captainys/TOWNSROM, folder `release/forTsugaru` or
+`release/forUNZ`): choose that release in the "Free FM Towns ROMs" setting.
+Many games do not run on them.
+
+The Marty has not been booted yet. Its system and OS ROMs, as the package
+pins them, were not on hand to test, and MAME's other Marty set
+(`fmtmarty`, whose `mrom.m37` holds the system ROM) has another revision of
+the system ROM, which the package does not take.
 
 ## Build and test
 

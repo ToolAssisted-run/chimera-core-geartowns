@@ -247,6 +247,84 @@ printf '{"floppy":["disk1.hdm","disk2.d88"]}' > "$wd/slots"
 media_leg "floppy:inserted" "$wd" "$work/idle.txt"
 media_leg "floppy:next-disk" "$wd" "$work/media.floppy:inserted.txt" --press "$(index_of 'Next Floppy Disk')" 100
 
+# ---- the save disk and the save data ----
+# With saveDisk on, the machine has a formatted blank floppy of its own,
+# made inside it: the save data export holds it beside the CMOS, the same
+# from both builds; without the setting the export is the CMOS alone.
+d88check() { python3 -c "
+import struct,sys
+d=open(sys.argv[1],'rb').read()
+t0=struct.unpack_from('<I',d,0x20)[0] if len(d)>0x2B0 else 0
+ok=(len(d)==0x2B0+154*8*(16+1024) and d[0x1B]==0x20 and struct.unpack_from('<I',d,0x1C)[0]==len(d)
+    and d[t0+16:t0+20]==b'IPL4' and d[t0+16+1040:t0+16+1043]==bytes((0xFE,0xFF,0xFF)))
+sys.exit(0 if ok else 1)" "$1" 2>/dev/null; }
+sdw="$(workdir savedisk '{"model":"model1_2","saveDisk":true}')"
+rm -rf "$work/sdd.n" "$work/sdd.b" && mkdir -p "$work/sdd.n" "$work/sdd.b"
+"$nat/run-native" "$sdw" --frames 60 --savedata-out "$work/sdd.n" > /dev/null 2>&1
+"$nat/run-wbx" "$gst/core.wbx" "$sdw" --frames 60 --savedata-out "$work/sdd.b" > /dev/null 2>&1
+names="$(cd "$work/sdd.b" && ls | tr '\n' ' ')"
+if [ "$names" = "CMOS.RAM SAVEDISK.d88 " ] && diff -r "$work/sdd.n" "$work/sdd.b" > /dev/null 2>&1 \
+	&& d88check "$work/sdd.b/SAVEDISK.d88" && [ "$(ls "$work/sd.b" | tr '\n' ' ')" = "CMOS.RAM " ]; then
+	report "savedisk:export" PASS "CMOS.RAM and a formatted 2HD SAVEDISK.d88, native == sandbox; the CMOS alone without it"
+else
+	report "savedisk:export" FAIL "exported: ${names:-nothing}; without the setting: $(ls "$work/sd.b" | tr '\n' ' ')"
+fi
+
+# Next Floppy Disk puts the save disk in drive 1, which the test program
+# reads the status of; it is not in the drive at power on.
+"$nat/run-wbx" "$gst/core.wbx" "$sdw" --frames "$FRAMES" 2>/dev/null | digests > "$work/sdidle.txt"
+if cmp -s "$work/sdidle.txt" "$work/idle.txt"; then
+	report "savedisk:not-at-power-on" PASS "drive 1 is empty until the disk is chosen"
+else
+	report "savedisk:not-at-power-on" FAIL "the machine with a save disk differs before it is chosen"
+fi
+media_leg "savedisk:next-disk" "$sdw" "$work/idle.txt" --press "$(index_of 'Next Floppy Disk')" 100
+
+# The save data slot takes back what the export gave: a zip of a CMOS and
+# a disk, each changed so it is not what the machine would make. The save
+# disk comes from it with the setting off, and after the disk has been in
+# drive 1 the export gives both back unchanged, also with a savestate saved
+# and loaded before every frame.
+python3 -c "
+import sys,zipfile
+src,out=sys.argv[1],sys.argv[2]
+c=bytearray(open(src+'/CMOS.RAM','rb').read()); c[0x1F00]^=0x5A
+d=bytearray(open(src+'/SAVEDISK.d88','rb').read()); d[0:9]=b'TAKENBACK'
+with zipfile.ZipFile(out,'w') as z:
+    z.writestr('CMOS.RAM',bytes(c)); z.writestr('SAVEDISK.d88',bytes(d))
+with zipfile.ZipFile(out[:-4]+'-bad.zip','w') as z:
+    z.writestr('CMOS.RAM',bytes(c)); z.writestr('OTHER.BIN',b'x')
+" "$work/sdd.b" "$work/taken.zip"
+imw="$(workdir import '{"model":"model1_2"}')"
+cp "$work/taken.zip" "$imw/save.zip"
+printf '{"savedata":["save.zip"]}' > "$imw/slots"
+rm -rf "$work/imp" && mkdir -p "$work/imp" && (cd "$work/imp" && python3 -c "import zipfile; zipfile.ZipFile('$work/taken.zip').extractall('.')")
+good=1
+for kind in native wbx rerecord; do
+	rm -rf "$work/imo" && mkdir -p "$work/imo"
+	case "$kind" in
+		native) "$nat/run-native" "$imw" --frames 200 --press "$(index_of 'Next Floppy Disk')" 50 --savedata-out "$work/imo" > /dev/null 2>"$work/imo.err" ;;
+		wbx) "$nat/run-wbx" "$gst/core.wbx" "$imw" --frames 200 --press "$(index_of 'Next Floppy Disk')" 50 --savedata-out "$work/imo" > /dev/null 2>"$work/imo.err" ;;
+		rerecord) "$nat/run-wbx" "$gst/core.wbx" "$imw" --frames 200 --press "$(index_of 'Next Floppy Disk')" 50 --rerecord --savedata-out "$work/imo" > /dev/null 2>"$work/imo.err" ;;
+	esac
+	grep -q "floppy 1: the save disk" "$work/imo.err" && diff -r "$work/imp" "$work/imo" > /dev/null 2>&1 || { good=0; break; }
+done
+if [ "$good" = 1 ]; then
+	report "savedata:import" PASS "a CMOS and a save disk taken back come out unchanged (native, sandbox, savestate every frame)"
+else
+	report "savedata:import" FAIL "$kind: $(grep -m1 -v '^\[' "$work/imo.err") exported $(ls "$work/imo" | tr '\n' ' ')"
+fi
+
+# What the save data slot does not know is refused, not ignored.
+cp "$work/taken-bad.zip" "$imw/save.zip"
+if "$nat/run-wbx" "$gst/core.wbx" "$imw" --frames 10 > /dev/null 2>"$work/bad.err"; then
+	report "savedata:refuse" FAIL "a zip with OTHER.BIN in it was taken"
+elif grep -q "error.savedata_unknown" "$work/bad.err"; then
+	report "savedata:refuse" PASS "a zip with a file it does not know is refused, naming it"
+else
+	report "savedata:refuse" FAIL "refused, but not for the unknown file: $(grep -m1 -v '^\[' "$work/bad.err")"
+fi
+
 # the CD, booted: the Free FM Towns Project's compatible system ROM, built
 # from its source at the commit tests/free/compat-rom.ref names, reads the
 # disc's first sector and runs our boot program, which notes the drive it
@@ -310,30 +388,8 @@ if [ -n "${CHIMERA_ROOT:-}" ] && [ -x "$runner" ] && [ -f "$package" ]; then
 		report "engine:input-polls" FAIL "inputPolls=${polls:-missing} frames=${frames:-?} lagFrames=${lags:-?}; $(tail -1 "$work/polls.log" 2> /dev/null)"
 	fi
 
-	# the core's own tool, Make a Blank Floppy Disk: a 1232 KB (2HD) D88
-	# image, formatted - all 154 tracks of eight 1024-byte sectors, a boot
-	# sector and an empty file table - which the core takes in drive 1 like
-	# any floppy (the test program reads the drive's status)
-	rm -f "$work/blank.d88"
-	"$runner" --run-tool blank_floppy "$package" --output "disk=$work/blank.d88" > "$work/tool.log" 2>&1
-	d88="$(python3 -c "
-import struct,sys
-d=open(sys.argv[1],'rb').read()
-t0=struct.unpack_from('<I',d,0x20)[0] if len(d)>0x2B0 else 0
-ok=(len(d)==0x2B0+154*8*(16+1024) and d[0x1B]==0x20 and struct.unpack_from('<I',d,0x1C)[0]==len(d)
-    and d[0:8]==b'USERDISK' and d[t0+16:t0+20]==b'IPL4' and d[t0+16+1040:t0+16+1043]==bytes((0xFE,0xFF,0xFF)))
-print('ok' if ok else 'bad')" "$work/blank.d88" 2>/dev/null)"
-	if [ "$d88" != ok ]; then
-		report "tool:blank-floppy" FAIL "no formatted 2HD D88 image made: $(tail -1 "$work/tool.log")"
-	else
-		wd="$(workdir blankfd '{"model":"model1_2"}')"
-		cp "$work/blank.d88" "$wd/"
-		printf '{"floppy":["blank.d88"]}' > "$wd/slots"
-		media_leg "tool:blank-floppy" "$wd" "$work/idle.txt"
-	fi
 else
 	printf "%-26s %-6s %s\n" "engine:input-polls" SKIP "needs CHIMERA_ROOT with build/dll/chimera-run and build/Cores/geartowns.chimeraCore"
-	printf "%-26s %-6s %s\n" "tool:blank-floppy" SKIP "needs CHIMERA_ROOT, as above"
 fi
 
 echo ""

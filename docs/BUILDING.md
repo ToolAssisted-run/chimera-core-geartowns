@@ -115,13 +115,14 @@ machine's. Its files are in `waterbox/tests/work/`.
 
 No test runs Fujitsu's ROMs or a game: they may not be passed on. To try
 one by hand, make a folder under `tests/roms-local/` (ignored by git) and
-copy into it the firmware files by the names the package asks for, the
-game's `.cue` with its tracks, and a blank floppy if the game saves to one.
-Then write the two files Chimera would mount, `settings` and `slots`:
+copy into it the firmware files by the names the package asks for and the
+game's `.cue` with its tracks. Then write the two files Chimera would mount,
+`settings` and `slots` (`saveDisk` gives the machine its own blank floppy,
+for a game that saves to one):
 
 ```
-printf '{"model":"mx"}' > settings
-printf '{"cdrom":["Game.cue"],"floppy":["blank.d88"]}' > slots
+printf '{"model":"mx","saveDisk":true}' > settings
+printf '{"cdrom":["Game.cue"]}' > slots
 build/meson-native/run-native <folder> --frames 20000 --shots /tmp/shots 300 --script input.txt
 build/meson-native/run-wbx build/meson-guest/core.wbx <folder> --frames 20000 --script input.txt
 ```
@@ -131,12 +132,11 @@ build/meson-native/run-wbx build/meson-guest/core.wbx <folder> --frames 20000 --
 one control on those frames (the index is the control's place in
 `waterbox.config`'s `input.buttons`, counting from 0), and a line
 `<first> <last> m <dx> <dy>` moves the mouse on each of them. Both runners
-print the same digests, so the two can be compared.
-
-A blank floppy comes from the core's own tool: in Chimera's window, Tools >
-Core-Specific Tools > Geartowns > Make a Blank Floppy Disk, or from a shell,
-`chimera-run --run-tool blank_floppy <package> --output disk=blank.d88`.
-`docs/PLAN.md` says which games were tried and how far they got.
+print the same digests, so the two can be compared. `--savedata-out <dir>`
+writes the save data (`CMOS.RAM`, and `SAVEDISK.d88` with the save disk);
+put a zip of them in the folder and `"savedata":["save.zip"]` in `slots` to
+start from it. `docs/PLAN.md` says which games were tried and how far they
+got.
 
 ## What CI does
 

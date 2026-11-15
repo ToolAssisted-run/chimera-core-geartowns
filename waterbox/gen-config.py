@@ -43,7 +43,7 @@ MODELS = ["model1_2", "1f_2f", "10f_20f", "cx", "ux", "ug", "hg", "hr", "ur",
 SETS = {
     "model12": {
         "models": ["model1_2"],
-        "free": False,
+        "free": "off",
         "files": {
             "FMT_SYS.ROM": (262144, "15D9CC705F3534FE97A2386E4D4848A1602CC534"),
             "FMT_DOS.ROM": (524288, "57FD146478226F7F215CAF63154C763A6D52165E"),
@@ -51,11 +51,26 @@ SETS = {
             "FMT_DIC.ROM": (524288, "3959C4C6BE540252CABEA06847BCD408F1911CFB"),
         },
     },
+    # the free ROMs: captainys/TOWNSROM's two releases at the commit
+    # tests/free/compat-rom.ref names, release/forTsugaru and release/forUNZ.
+    # They differ only in the system ROM. The freeTownsRoms setting says
+    # which, so each file has one SHA-1.
     "free": {
         "models": ["model1_2"],
-        "free": True,
+        "free": "forTsugaru",
         "files": {
             "FMT_SYS.ROM": (262144, "7E8B341137A017CA963EEADA66C70EBD21E3E549"),
+            "FMT_DOS.ROM": (524288, "5A426EADEC4E518145FCE761AF571AF54C15267D"),
+            "FMT_FNT.ROM": (262144, "7E99430B7804F12F1C35DFAF24AE27A5F13D9FE9"),
+            "FMT_DIC.ROM": (524288, "13A184EC9E176371808938015111F8918CB4DF7D"),
+        },
+    },
+    "freeunz": {
+        "models": ["model1_2"],
+        "free": "forUNZ",
+        "labels": "free",
+        "files": {
+            "FMT_SYS.ROM": (262144, "D831F7C51E4D30520F8751C92359DFE89C039EC1"),
             "FMT_DOS.ROM": (524288, "5A426EADEC4E518145FCE761AF571AF54C15267D"),
             "FMT_FNT.ROM": (262144, "7E99430B7804F12F1C35DFAF24AE27A5F13D9FE9"),
             "FMT_DIC.ROM": (524288, "13A184EC9E176371808938015111F8918CB4DF7D"),
@@ -124,7 +139,7 @@ def firmware():
                 "id": name,
                 "display": f"firmware.{f}",
                 "description": f"firmware.{set_id}.about",
-                "label": f"firmware.{set_id}.{f}",
+                "label": f"firmware.{s.get('labels', set_id)}.{f}",
                 "name": name,
                 "size": size,
                 "sha1": sha1,
@@ -154,7 +169,7 @@ def settings():
     ports = ["auto", "pad", "pad6", "martyPad", "mouse", "none"]
     return [
         setting("model", MODELS, "model1_2"),
-        setting("freeTownsRoms", None, False,
+        setting("freeTownsRoms", ["off", "forTsugaru", "forUNZ"], "off",
                 exposedWhen={"setting": "model", "is": "model1_2"}),
         setting("cpuMhz", ["auto", "16", "20", "25", "33", "40", "50", "66", "100"], "auto", ["auto"]),
         setting("ramMb", ["auto", "1", "2", "4", "6", "8", "10", "12", "16", "20", "24", "32", "48", "64", "96"], "auto", ["auto"]),
@@ -163,6 +178,7 @@ def settings():
         setting("bootDevice", ["auto", "cdrom", "floppy1", "floppy2"], "auto"),
         setting("portA", ports, "auto"),
         setting("portB", ports, "auto"),
+        setting("saveDisk", None, False),
     ]
 
 
@@ -221,19 +237,6 @@ def config(ks):
         "extensions": {e: "FMTowns" for e in [".cue", ".iso", ".chd", ".d77", ".d88", ".hdm", ".xdf", ".mfm"]},
         "settings": settings(),
         "firmware": firmware(),
-        # Many games keep their saves on a floppy of the player's own (a
-        # "user disk" or "save disk") and ask for a blank one. This makes one,
-        # as Towns OS's FORMAT would: a 1232 KB (2HD) disk, formatted and
-        # empty, written as a .d88 image the person then adds to the
-        # project's floppy slot.
-        "tools": [{
-            "id": "blank_floppy",
-            "menu": "tool.blank_floppy",
-            "description": "tool.blank_floppy.about",
-            "inputs": [],
-            "options": [],
-            "outputs": [{"name": "disk", "label": "tool.blank_floppy.disk", "extension": "d88"}],
-        }],
     }
 
 

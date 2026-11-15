@@ -11,6 +11,7 @@
  * native reference build (native-shim/emulibc.h): the test script compares
  * the two.
  */
+#include <cctype>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdio>
@@ -113,6 +114,19 @@ static std::vector<std::string> g_cds;
 static int g_floppyIn = -1;
 static int g_cdIn = -1;
 
+/* The save disk, as upstream's libretro core's "Save Disk" option makes one:
+ * a formatted, empty 2HD floppy that joins the end of the floppy list, after
+ * the project's own, and goes into drive 1 only when Next Floppy Disk puts
+ * it there. It is made in Init, before the seal, from Geartowns' own blank
+ * (or from the project's save data), and lives here in the machine's memory,
+ * so savestates carry it, and it is given out as save data. Nothing of it is
+ * written on the host. While it is in the drive the drive's own copy is the
+ * live one; it is copied back here when another disk replaces it. */
+static std::vector<u8> g_saveDisk;
+static bool g_hasSaveDisk;
+#define SAVE_DISK_NAME "SAVEDISK.d88"
+#define CMOS_NAME "CMOS.RAM"
+
 /* ---------------------------------------------------------------- settings */
 
 static const char *const k_models[GT_MACHINE_COUNT] = {
@@ -211,8 +225,75 @@ static void slot_files(const char *slot, std::vector<std::string> &out)
 	}
 }
 
+static int floppy_count(void)
+{
+	return (int)g_floppies.size() + (g_hasSaveDisk ? 1 : 0);
+}
+
+static bool is_save_disk(int index)
+{
+	return g_hasSaveDisk && index == (int)g_floppies.size();
+}
+
+/* the save disk's bytes as they are now: the drive's copy while it is in */
+static const u8 *save_disk_now(u32 *size)
+{
+	if (is_save_disk(g_floppyIn))
+	{
+		FloppyDisk *disk = g_core->GetFloppy(0);
+		if (disk && disk->IsInserted())
+		{
+			*size = disk->GetImageSize();
+			return disk->GetImage();
+		}
+	}
+	*size = (u32)g_saveDisk.size();
+	return g_saveDisk.data();
+}
+
+static void keep_save_disk(void)
+{
+	if (!is_save_disk(g_floppyIn))
+		return;
+	u32 size = 0;
+	const u8 *now = save_disk_now(&size);
+	if (now != g_saveDisk.data())
+		g_saveDisk.assign(now, now + size);
+}
+
+/* The blank's volume label carries the date it was made, from the host's
+ * clock. Both builds date it from the machine's clock start instead, so the
+ * native reference makes the same disk the sandbox does. */
+static void date_volume_label(void)
+{
+	static const char label[] = "USERDISK   \x28";
+	time_t t = (time_t)clock_start();
+	struct tm *tm = gmtime(&t);
+	if (!tm || tm->tm_year < 80)
+		return;
+	for (size_t i = 0; i + 32 <= g_saveDisk.size(); i++)
+	{
+		if (memcmp(&g_saveDisk[i], label, 12) != 0)
+			continue;
+		u16 tod = (u16)((tm->tm_hour << 11) | (tm->tm_min << 5) | (tm->tm_sec / 2));
+		u16 day = (u16)(((tm->tm_year - 80) << 9) | ((tm->tm_mon + 1) << 5) | tm->tm_mday);
+		g_saveDisk[i + 22] = tod & 0xFF;
+		g_saveDisk[i + 23] = tod >> 8;
+		g_saveDisk[i + 24] = day & 0xFF;
+		g_saveDisk[i + 25] = day >> 8;
+		return;
+	}
+}
+
 static bool insert_floppy(int index, int drive)
 {
+	if (is_save_disk(index))
+	{
+		if (!g_core->InsertFloppy(drive, g_saveDisk.data(), (u32)g_saveDisk.size(), false))
+			return false;
+		fprintf(stderr, "[geartowns] floppy %d: the save disk\n", drive + 1);
+		return true;
+	}
 	std::vector<u8> data;
 	const char *name = g_floppies[(size_t)index].c_str();
 	if (!read_file(name, data))
@@ -233,6 +314,103 @@ static bool insert_cd(int index)
 		return false;
 	fprintf(stderr, "[geartowns] CD: %s\n", name);
 	return true;
+}
+
+/* ---------------------------------------------------------------- save data in
+ * The project's save data slot takes back what GetSaveDataFile* gives out:
+ * CMOS.RAM, SAVEDISK.d88, or both in a zip (Chimera writes several files as
+ * one zip). A file is known by the end of its name, since Chimera saves an
+ * export under the game's name and the date, followed by the core's name
+ * for it. Anything else is refused, never ignored. */
+static bool ends_with(const std::string &s, const char *end)
+{
+	size_t n = strlen(end);
+	if (s.size() < n)
+		return false;
+	for (size_t i = 0; i < n; i++)
+		if (tolower((unsigned char)s[s.size() - n + i]) != tolower((unsigned char)end[i]))
+			return false;
+	return true;
+}
+
+static bool take_save_file(const std::string &name, const u8 *data, size_t size,
+	std::vector<u8> &cmos, std::vector<u8> &disk)
+{
+	if (ends_with(name, CMOS_NAME))
+	{
+		if (size != GT_CMOS_SIZE)
+		{
+			snprintf(g_loadError, sizeof g_loadError, "error.savedata_cmos" TEXT_ARG "%s", name.c_str());
+			return false;
+		}
+		cmos.assign(data, data + size);
+		return true;
+	}
+	if (ends_with(name, ".d88") || ends_with(name, ".d77"))
+	{
+		if (!FloppyImage::IsD77(data, (u32)size) || data[0x1B] != 0x20)
+		{
+			snprintf(g_loadError, sizeof g_loadError, "error.savedata_disk" TEXT_ARG "%s", name.c_str());
+			return false;
+		}
+		disk.assign(data, data + size);
+		return true;
+	}
+	snprintf(g_loadError, sizeof g_loadError, "error.savedata_unknown" TEXT_ARG "%s", name.c_str());
+	return false;
+}
+
+static bool read_save_data(std::vector<u8> &cmos, std::vector<u8> &disk)
+{
+	if (wbx_slot_count("savedata") < 1)
+		return true;
+	char name[1024];
+	if (!wbx_slot_name("savedata", 0, name, sizeof name))
+		return true;
+	std::vector<u8> file;
+	if (!read_file(name, file))
+	{
+		snprintf(g_loadError, sizeof g_loadError, "error.savedata_unknown" TEXT_ARG "%s", name);
+		return false;
+	}
+	if (!ends_with(name, ".zip"))
+		return take_save_file(name, file.data(), file.size(), cmos, disk);
+
+	mz_zip_archive zip;
+	memset(&zip, 0, sizeof zip);
+	if (!mz_zip_reader_init_mem(&zip, file.data(), file.size(), 0))
+	{
+		snprintf(g_loadError, sizeof g_loadError, "error.savedata_unknown" TEXT_ARG "%s", name);
+		return false;
+	}
+	bool ok = true;
+	mz_uint count = mz_zip_reader_get_num_files(&zip);
+	for (mz_uint i = 0; ok && i < count; i++)
+	{
+		mz_zip_archive_file_stat st;
+		if (!mz_zip_reader_file_stat(&zip, i, &st) || st.m_is_directory)
+			continue;
+		size_t size = 0;
+		void *data = mz_zip_reader_extract_to_heap(&zip, i, &size, 0);
+		if (!data)
+		{
+			snprintf(g_loadError, sizeof g_loadError, "error.savedata_unknown" TEXT_ARG "%s", st.m_filename);
+			ok = false;
+			break;
+		}
+		/* an entry must be one of the two names exactly */
+		std::string entry(st.m_filename);
+		if (entry != CMOS_NAME && entry != SAVE_DISK_NAME)
+		{
+			snprintf(g_loadError, sizeof g_loadError, "error.savedata_unknown" TEXT_ARG "%s", entry.c_str());
+			ok = false;
+		}
+		else
+			ok = take_save_file(entry, (const u8 *)data, size, cmos, disk);
+		mz_free(data);
+	}
+	mz_zip_reader_end(&zip);
+	return ok;
 }
 
 /* ---------------------------------------------------------------- input */
@@ -332,7 +510,31 @@ ECL_EXPORT int Init(void)
 	g_video = new uint32_t[GT_MAX_FRAME_BUFFER_WIDTH * GT_MAX_FRAME_BUFFER_HEIGHT];
 	memset(g_video, 0, GT_MAX_FRAME_BUFFER_WIDTH * GT_MAX_FRAME_BUFFER_HEIGHT * 4);
 
-	/* the media: the first disk of each kind goes in at power on */
+	/* the save data, and the save disk: made when the saveDisk setting is on
+	 * or the save data brings one */
+	std::vector<u8> savedCmos, savedDisk;
+	if (!read_save_data(savedCmos, savedDisk))
+		return 0;
+	g_hasSaveDisk = !savedDisk.empty() || wbx_setting_bool("saveDisk", 0);
+	if (!savedDisk.empty())
+		g_saveDisk.swap(savedDisk);
+	else if (g_hasSaveDisk)
+	{
+		u32 size = 0;
+		u8 *blank = FloppyImage::CreateBlank(FLOPPY_BLANK_2HD_1232, true, &size);
+		if (!blank)
+		{
+			snprintf(g_loadError, sizeof g_loadError, "error.savedata_disk" TEXT_ARG SAVE_DISK_NAME);
+			return 0;
+		}
+		g_saveDisk.assign(blank, blank + size);
+		delete[] blank;
+		date_volume_label();
+	}
+
+	/* the media: the first disk of each kind goes in at power on; the save
+	 * disk does not (upstream's libretro core leaves it out of the drive
+	 * until it is chosen) */
 	slot_files("floppy", g_floppies);
 	slot_files("cdrom", g_cds);
 	if (!g_floppies.empty())
@@ -355,6 +557,8 @@ ECL_EXPORT int Init(void)
 	}
 
 	g_core->LatchAutoMedia();
+	if (!savedCmos.empty())
+		memcpy(g_core->GetMemory()->GetCMOS(), savedCmos.data(), GT_CMOS_SIZE);
 
 	static const char *const boot[] = { "auto", "cdrom", "floppy1", "floppy2", "hdd0", "hdd1", "hdd2", "hdd3", "hdd4", "card" };
 	g_core->SetBootDevice((GT_Boot_Device)setting_choice("bootDevice", boot, 10, 0));
@@ -418,9 +622,10 @@ ECL_EXPORT void FrameAdvance(uint64_t packed)
 	if (pressed(BTN_POWER) || pressed(BTN_RESET))
 		g_core->ResetMedia();
 
-	if (pressed(BTN_NEXT_FLOPPY) && !g_floppies.empty())
+	if (pressed(BTN_NEXT_FLOPPY) && floppy_count() > 0)
 	{
-		int next = (g_floppyIn + 1) % (int)g_floppies.size();
+		int next = (g_floppyIn + 1) % floppy_count();
+		keep_save_disk();
 		if (insert_floppy(next, 0))
 			g_floppyIn = next;
 	}
@@ -523,43 +728,37 @@ ECL_EXPORT int GetMemoryDomainWritable(int i)
 
 /* ---------------------------------------------------------------- save data
  * What the machine keeps when it is off: its CMOS (the backup RAM, where
- * Towns OS and games keep settings and saves). */
-ECL_EXPORT int32_t GetSaveDataFileCount(void) { return g_core ? 1 : 0; }
-ECL_EXPORT const char *GetSaveDataFileName(int32_t i) { return i == 0 ? "CMOS.RAM" : NULL; }
-ECL_EXPORT int64_t GetSaveDataFileSize(int32_t i) { return i == 0 ? GT_CMOS_SIZE : 0; }
+ * Towns OS and games keep settings and saves), and the save disk when there
+ * is one. The list is taken when the count is asked. */
+static const char *g_sdName[2];
+static const u8 *g_sdData[2];
+static int64_t g_sdSize[2];
+static int32_t g_sdCount;
+
+ECL_EXPORT int32_t GetSaveDataFileCount(void)
+{
+	g_sdCount = 0;
+	if (!g_core)
+		return 0;
+	g_sdName[0] = CMOS_NAME;
+	g_sdData[0] = g_core->GetMemory()->GetCMOS();
+	g_sdSize[0] = GT_CMOS_SIZE;
+	g_sdCount = 1;
+	if (g_hasSaveDisk)
+	{
+		u32 size = 0;
+		g_sdData[1] = save_disk_now(&size);
+		g_sdSize[1] = size;
+		g_sdName[1] = SAVE_DISK_NAME;
+		g_sdCount = 2;
+	}
+	return g_sdCount;
+}
+ECL_EXPORT const char *GetSaveDataFileName(int32_t i) { return i >= 0 && i < g_sdCount ? g_sdName[i] : NULL; }
+ECL_EXPORT int64_t GetSaveDataFileSize(int32_t i) { return i >= 0 && i < g_sdCount ? g_sdSize[i] : 0; }
 ECL_EXPORT const uint8_t *GetSaveDataFileBuffer(int32_t i)
 {
-	return i == 0 && g_core ? g_core->GetMemory()->GetCMOS() : NULL;
-}
-
-/* ---------------------------------------------------------------- tools
- * Called instead of Init, with no machine (Chimera docs/project.md, "A
- * core's own tools"). blank_floppy writes a formatted, empty 1232 KB disk,
- * Geartowns' own blank (FloppyImage::CreateBlank, as its libretro core makes
- * a save disk), to the output "disk". Games that keep saves on a disk of the
- * player's own ask for one, and some do not take an unformatted one. */
-ECL_EXPORT const char *RunTool(void)
-{
-	static char req[4096];
-	FILE *r = fopen("tool", "rb");
-	size_t n = r ? fread(req, 1, sizeof req - 1, r) : 0;
-	if (r)
-		fclose(r);
-	req[n] = 0;
-	if (!strstr(req, "\"tool\":\"blank_floppy\""))
-		return "{\"refused\": \"tool.unknown\"}";
-
-	u32 size = 0;
-	u8 *image = FloppyImage::CreateBlank(FLOPPY_BLANK_2HD_1232, true, &size);
-	if (!image)
-		return "{\"refused\": \"tool.blank_floppy.failed\"}";
-	FloppyImage::SetDiskName(image, size, "USERDISK");
-	FILE *out = fopen("disk", "wb");
-	bool ok = out && fwrite(image, 1, size, out) == size;
-	if (out)
-		ok = fclose(out) == 0 && ok;
-	delete[] image;
-	return ok ? "{\"done\": \"tool.blank_floppy.done\"}" : "{\"refused\": \"tool.blank_floppy.failed\"}";
+	return i >= 0 && i < g_sdCount ? g_sdData[i] : NULL;
 }
 
 } /* extern "C" */

@@ -72,10 +72,11 @@ not depending on the host CPU).
 firmware: the system ROM, the OS ROM, the font ROM and the dictionary ROM,
 plus the 20-dot font ROM for the last-generation models and the four
 extension ROMs for the Marty. The Free FM Towns Project's replacement ROMs
-(github.com/captainys/FreeTOWNSOS, folder CompROM) run the Model 1/2 and
-are accepted as a firmware set of their own (the `freeTownsRoms` setting).
-The serial ROM (MYTOWNS.ROM) is not asked for: Geartowns makes one when it is
-missing.
+(github.com/captainys/TOWNSROM) run the Model 1/2 and are accepted as
+firmware sets of their own: the `freeTownsRoms` setting picks the release
+for Tsugaru or the one for UNZ (section 4). The serial ROM (MYTOWNS.ROM) is
+not asked for: Geartowns makes one when it is missing. The Marty has not
+been booted on real ROMs (section 4).
 
 **What a test can run on a public runner.** Our own program: a system ROM
 written for this core (`tests/free/towns-test.asm`, assembled with nasm at
@@ -146,10 +147,27 @@ of it is in the package.
   floppy is part of every savestate, and the project's files are never
   written. A CD is read from its file as the machine asks (the file does not
   change, and Geartowns keeps what it read in its own memory).
+- **The save disk** (owner, 2026-11-15) is upstream's libretro "Save Disk"
+  option built into the machine: with the `saveDisk` setting on (off by
+  default, as upstream's), the core makes Geartowns' formatted blank 1232 KB
+  floppy in Init, before the seal, and adds it to the end of the floppy list,
+  after the project's own floppies. Like upstream's, it is not in a drive at
+  power on: Next Floppy Disk puts it in drive 1. It lives in the machine's
+  memory, so savestates carry it, and while it is in the drive the drive's
+  copy is the live one, copied back when another disk replaces it. Nothing of
+  it is written on the host. Its volume label is dated from the machine's
+  clock start, so the native reference makes the same disk.
+- **Save data** is the CMOS (`CMOS.RAM`, 8 KB) and, when there is a save
+  disk, `SAVEDISK.d88`; Chimera's Export Save Data writes the two as a zip.
+  The project's save data slot takes back either file, or the zip, and the
+  machine starts with them. A save disk in the save data is the machine's
+  save disk even with the setting off. A file or zip entry the core does not
+  know, a CMOS of another size, or a disk that is not a 2HD D88 image is
+  refused, naming the file.
 
 ## 3. Tests
 
-`waterbox/run-gate.sh` (needs nasm; 45 checks with `CHIMERA_ROOT` and
+`waterbox/run-gate.sh` (needs nasm; 49 checks with `CHIMERA_ROOT` and
 `GEARTOWNS_COMPAT_ROM_SRC`, about 2 minutes on jaffanator01):
 
 - every model (14): native == sandbox over 300 frames of a fixed schedule of
@@ -166,10 +184,16 @@ of it is in the package.
   drive's status); Next Floppy Disk puts in the second, write-protected
   disk; and the compatible ROM boots our boot program from a CD, which notes
   that it came from the CD. Each native == sandbox == savestate every frame.
+- the save disk and save data: with `saveDisk` on, the export holds
+  `CMOS.RAM` and a formatted 2HD `SAVEDISK.d88`, the same from both builds,
+  and without it the CMOS alone; the disk is not in drive 1 at power on;
+  Next Floppy Disk puts it there (native == sandbox == savestate every
+  frame); a zip of a changed CMOS and a changed disk in the save data slot
+  comes out of the export unchanged after the disk has been in the drive
+  (native, sandbox, and a savestate saved and loaded every frame); and a zip
+  with a file the core does not know is refused.
 - through Chimera's engine (with `CHIMERA_ROOT`): the reads of the controls
-  reach Chimera, and counting them changes nothing; and the core's own tool,
-  Make a Blank Floppy Disk, writes a formatted 1232 KB disk that the core
-  takes in drive 1.
+  reach Chimera, and counting them changes nothing.
 
 `waterbox/tests/run-frontend.sh` (Chimera's window, headless): Main RAM
 equals the native reference's with nothing pressed, with a pad held through
@@ -211,16 +235,32 @@ are not among the dumps as loose files: FMT_SYS.ROM (7B1C97FA...) and
 FMT_DOS.ROM (99CD51C5...). MAME's `fmtmarty.zip` holds the Marty's firmware
 in two files, `mrom.m36` and `mrom.m37`, which Geartowns splits itself; cut
 the same way, `mrom.m36` gives the pinned FMT_DOS.ROM, but `mrom.m37` gives
-another system ROM (8737BD50...) and other extension ROMs. So the Marty was
-not tried. The loose `MYTOWNS.ROM` is the UX's serial ROM, which the package
-does not ask for (Geartowns makes one).
+another system ROM (8737BD50...) and other extension ROMs. So the Marty has
+not been booted on real ROMs. The owner chose to keep it as it is, pinned to
+the loose files, and untested (owner, 2026-11-15); the README and the Marty
+firmware's description in the window say so. The loose `MYTOWNS.ROM` is the
+UX's serial ROM, which the package does not ask for (Geartowns makes one).
 
-The free ROMs (the `freeTownsRoms` setting) are pinned as the release files
-of captainys/TOWNSROM at the commit `tests/free/compat-rom.ref` names (its
-`release/forTsugaru` folder). The same folder for another emulator,
-`release/forUNZ`, has another system ROM (D831F7C5...), and the one the test
-script builds from source has a third; the tests boot the one they build,
-through the runners, so no test depends on that pin.
+The free ROMs are the release files of captainys/TOWNSROM at the commit
+`tests/free/compat-rom.ref` names. It has two releases: `release/forTsugaru`
+and `release/forUNZ`, made for two other emulators. Only their system ROMs
+differ (7E8B3411... and D831F7C5...); the OS, font and dictionary ROMs are
+the same files. The owner chose to take both (owner, 2026-11-15). A firmware
+entry names one SHA-1 and Chimera is not changed, so the `freeTownsRoms`
+setting, which was on or off, now has three values: `off` (Fujitsu's ROMs),
+`forTsugaru` and `forUNZ`, each with its own set of four entries under the
+same file names. Chosen over leaving the system ROM unpinned: an unpinned
+entry is found by name and size alone, so Fujitsu's FMT_SYS.ROM would pass
+for a free one and Scan Folder would find two candidates. The package was
+not published before, so no project holds the old on/off value. Both sets
+boot through the package (`chimera-run`, Model 1/2, 1800 frames): each
+shows its own boot screen, Tsugaru's and UNZ's, under the compatible ROMs'
+notice, and with no media it says, in Japanese, that there is no system to
+start (frames 300 and 900). With Gokuraku Mandala's CD in, each says
+it is loading the system and the picture is the same at frames 300 and 900;
+the game was not seen to start on either. The test script builds a third
+system ROM from source for its CD test (D4051FE8..., another assembler);
+the tests boot it through the runners, so no test depends on these pins.
 
 **The games**, both CD images (a `.cue` and its tracks), run headless in
 the native runner and the sandboxed core (`run-native`, `run-wbx`, with
@@ -228,59 +268,72 @@ the native runner and the sandboxed core (`run-native`, `run-wbx`, with
 the package and Chimera's engine as a project (`chimera-run`). Frame
 numbers are from power on.
 
-- *4D Boxing*, on the Model 1/2 with its own ROMs. Fujitsu's boot screen
-  (frame 300), then the game asks to make a user disk (frame 3000). With an
-  unformatted image in drive 1 it asks for the disk again and again; with a
-  formatted blank floppy it writes to it, asks "NO DISK ON DRIVE A, USE CD
-  DRIVE?" (frame 4500), and on OK the Electronic Arts logo and the credits
-  play with CD music (frames 4950 to 7000), and the title menu is up from
-  frame 8250. Whether the user disk it wrote is read back later was not
-  checked. Exhibition, the boxer
-  chosen as "HUMAN", the ring and the announcer (15900), and the round starts
-  when pad button A is pressed (19000): the fight with its timer and
-  strength bars (19500). Holding the pad's Left moves the player's boxer
-  across the ring, where without it he stays in his corner (frame 19800 of
-  the two runs). The game is driven with the mouse (port B) in its menus.
-- *Gokuraku Mandala*, on the MX with the V10 ROMs. The game's
-  first menu at frame 1800; Make Save Disk formats the blank floppy (154
-  tracks) and says the user disk was made (frame 9000); the Fairytale logo
-  (11100), the name prompt (12000), the title screen with music (12900),
-  Game Start, and the first scene of play with its text (15000 and on). It
-  also reaches its first menu on the UX and on the HR with their own ROMs
-  (by frames 3000 and 2000). On the Model 1/2 it reaches the same menu, but
-  making the save disk fails: the floppy controller reports lost data on
-  most of the tracks it formats, and the game says an error happened
-  (frame 6600). On the MX no track fails. That is Geartowns' own emulation of
-  the drive at 16 MHz, not this core's code; it was not checked against
-  upstream's own program.
+The first runs, on 2026-11-15, put a blank floppy image in the project's
+floppy slot by hand. They are now run with the machine's own save disk
+(section 2) and no floppy in the project; the frames below are those runs.
+
+- *4D Boxing*, on the Model 1/2 with its own ROMs, `saveDisk` on.
+  Fujitsu's boot screen (frame 300), then the game asks to make a user disk
+  (frame 3000). OK, then "SET BLANK DISK ON DRIVE A:" (3300); Next Floppy
+  Disk puts the save disk in (3350), and on OK the game writes its user disk
+  to it. The Electronic Arts logo (4500) and the credits play with CD music,
+  and the title menu is up from frame 8100. Exhibition, the boxer chosen as
+  "HUMAN" (10400), the ring and the announcer, and the round starts when pad
+  button A is pressed (17500): the fight with its timer and strength bars
+  (18000). Holding the pad's Left moves the player's boxer across the ring,
+  where without it he stays in his corner (frame 18300 of the two runs). The
+  game is driven with the mouse (port B) in its menus. The exported save
+  disk holds what it wrote: the label USERDISK and CONFIG1.DAT to
+  CONFIG3.DAT, BCDATA1.DAT and BCDATA2.DAT. Given back through the save data
+  slot (the exported zip, `saveDisk` off), the game is told not to make a
+  new user disk, the save disk is put in drive A and chosen there (3300), and
+  the game goes on to the logo (3700) and the title (4400) without asking
+  again. That it read its boxers' data from it was not checked further.
+  Earlier, with an unformatted image in the drive, it asked for the disk
+  again and again.
+- *Gokuraku Mandala*, on the MX with the V10 ROMs, `saveDisk` on. The game's
+  first menu at frame 1800; Make Save Disk asks for a new disk, Next Floppy
+  Disk puts the save disk in (2100), and the game formats it (154 tracks)
+  and says the user disk was made (frame 9000); the Fairytale logo (11100),
+  the name prompt (12000), the title screen with music (12900), Game Start,
+  and the first scene of play with its text (15000 and on). The pictures are
+  the same as in the run with a blank floppy added by hand. It also reaches
+  its first menu on the UX and on the HR with their own ROMs (by frames 3000
+  and 2000). On the Model 1/2 it reaches the same menu, but making the save
+  disk fails: the floppy controller reports lost data on most of the tracks
+  it formats, and the game says an error happened (frame 6600). On the MX no
+  track fails. That is Geartowns' own emulation of the drive at 16 MHz, not
+  this core's code. Whether upstream's own program fails the same way could
+  not be checked: its desktop program needs SDL3, which Ubuntu 24.04 (the
+  build container) does not package, and building SDL3 from source is a
+  download and a package install the owner has to approve. It stays
+  unconfirmed.
 
 What the runs showed, with the numbers:
 
 - native == sandbox for 20000 frames of each game with its input (picture,
-  sound, lag and memory digests the same).
+  sound, lag and memory digests the same), in the first runs with a floppy
+  added by hand.
 - Through the package and Chimera's engine (`chimera-run --project`, a
-  project made with `--new-project`, the input as its movie): two plays of
-  20000 frames give the same Main RAM and VRAM; a seek back to frame 15000
-  and a play to the end gives them again; and `--rerecord`, a savestate
-  saved and loaded around every frame, gives them again. Main RAM is the same
-  as the sandboxed runner's. 4D Boxing: 27 s a play, 253 s with
-  `--rerecord`; Gokuraku Mandala: 68 s and 242 s, on jaffanator01.
-- The floppy files are never written: the blank disk's SHA-1 is the same
-  after every run in which the games wrote to it.
-
-**A blank floppy.** Both games keep their saves on a floppy of the player's
-own and stop until one is in the drive. An unformatted image is not enough
-for 4D Boxing, which asks for the disk again and again (Gokuraku Mandala
-formats its own). So the core has a tool of its own, Make a Blank Floppy
-Disk (Tools > Core-Specific Tools in the window, `chimera-run --run-tool
-blank_floppy`), which writes Geartowns' own formatted blank 1232 KB disk as
-a `.d88` image for the project's floppy slot, as upstream's libretro core
-makes its save disk. Both games above were run with it.
+  project made with `--new-project`, the input as its movie, the save disk
+  on, no floppy in the project): two plays (18500 frames of 4D Boxing, 20000
+  of Gokuraku Mandala) give the same Main RAM and VRAM, and the same save
+  data export; a seek back to frame 15000 and a play to the end gives the
+  same machine again; and `--rerecord`, a savestate saved and loaded around
+  every frame, gives it again. Main RAM is the same as the sandboxed
+  runner's. 4D Boxing: 24 s a play, 231 s with `--rerecord`; Gokuraku
+  Mandala: 69 s and 241 s, on jaffanator01.
+- The save data export holds `CMOS.RAM` and `SAVEDISK.d88`. Gokuraku
+  Mandala's save disk holds what it wrote: its label FLAGDISK and GOK.NAM
+  and GOK.FL0 to GOK.FL5. 4D Boxing's is listed above.
+- Nothing is written on the host: the project's files are only read, and
+  the save disk exists only in the machine and the export.
 
 What was not tried: the Marty (its loose system ROM is not among the
 dumps); the 1F/2F, 10F/20F, CX, UG, HG, UR, ME, MA and MF; any floppy game;
-saving and loading a game's own save; Chimera's window with these games
-(only the headless runner); and any game past its first minutes.
+loading a game's own save from inside the game past the point above;
+Chimera's window with these games (only the headless runner); and any game
+past its first minutes.
 
 ## 5. Log
 
@@ -315,3 +368,19 @@ saving and loading a game's own save; Chimera's window with these games
   of it (45 checks pass). That test was seen to fail with the tool writing
   an unformatted disk. The runners take `--script` (input over spans of
   frames, the mouse too) and `--shots` (a picture every n frames).
+- 2026-11-15 (later): the owner's four answers (owner, 2026-11-15).
+  The Marty stays pinned to the loose files and untested, and says so.
+  The free ROMs: both TOWNSROM releases are taken, by a third value of
+  `freeTownsRoms`; both boot through the package. The blank floppy is built
+  into the machine as upstream's libretro core does (the `saveDisk`
+  setting) and kept in its save data, with a save data slot to take it
+  back; the Make a Blank Floppy Disk tool and its texts are removed, as the
+  save disk covers what it was for. Mandala's failed save disk on the Model
+  1/2 could not be checked in upstream's own program (no SDL3 in the
+  container) and stays unconfirmed. Five new tests (save disk export, not in
+  the drive at power on, Next Floppy Disk, save data taken back, unknown
+  save data refused); each was seen to fail when broken on purpose (the
+  disk in the drive at power on, the CMOS not taken back, an unknown file
+  ignored, Next Floppy Disk skipping the save disk), and the export test
+  failed for real first: the blank's volume label carried the host's date,
+  so the native disk differed. 49 checks pass.
