@@ -301,14 +301,26 @@ floppy slot by hand. They are now run with the machine's own save disk
   the same as in the run with a blank floppy added by hand. It also reaches
   its first menu on the UX and on the HR with their own ROMs (by frames 3000
   and 2000). On the Model 1/2 it reaches the same menu, but making the save
-  disk fails: the floppy controller reports lost data on most of the tracks
-  it formats, and the game says an error happened (frame 6600). On the MX no
-  track fails. That is Geartowns' own emulation of the drive at 16 MHz, not
-  this core's code. Whether upstream's own program fails the same way could
-  not be checked: its desktop program needs SDL3, which Ubuntu 24.04 (the
-  build container) does not package, and building SDL3 from source is a
-  download and a package install the owner has to approve. It stays
-  unconfirmed.
+  disk fails: the game shows "making the save disk" and then says an error
+  happened (frame 6600). On the MX it works.
+- *The same in upstream's own program.* Upstream Geartowns 1.0.6 (the
+  commit the submodule pins), its Linux desktop program built unchanged in
+  the container with SDL3 3.4.20 (installed by the owner) and run headless
+  through its own MCP server (`--headless --mcp-stdio --portable`), with the
+  same ROMs and CD, and a blank floppy from its own Create Blank Floppy
+  (1232 KB, formatted) put in drive 0 when the game asks. The same input
+  as in the core, frame for frame. On the Model 1/2 the game's menu is up at
+  frame 4200, it shows "making the save disk" (5400) and then the same error
+  from frame 6600 on (pictures at 6600 and 8400). On the MX it formats the
+  disk and says the user disk was made (9050). Upstream's own trace of the
+  floppy controller logs 70 write-track (format) commands on the Model 1/2
+  before the error and 154 on the MX, every one ending with status $00. So
+  upstream fails the same way, and the failure is upstream's emulation, not
+  this core. What exactly goes wrong is not known: an earlier reading of the
+  controller's status register in this core, taken at the command after
+  each format, showed the lost-data bit after most of them on the Model
+  1/2, while upstream's trace shows the status at the end of the command
+  without it. Nothing was reported upstream.
 
 What the runs showed, with the numbers:
 
@@ -393,3 +405,7 @@ past its first minutes.
   `saveDisk` false where they mean it, and a new one checks that a project's
   own floppies go in before the save disk (seen to fail with the save disk
   left out of the list). 50 checks pass.
+- 2026-11-15 (last): Mandala's failed save disk on the Model 1/2 checked in
+  upstream's own program, built in a scratch copy with SDL3 (installed by
+  the owner) and driven headless through its MCP server: the same error at
+  the same frame, and the MX formats the disk there too (section 4).
