@@ -158,7 +158,8 @@ of it is in the package.
   it is written on the host. Its volume label is dated from the machine's
   clock start, so the native reference makes the same disk.
 - **Save data** is the CMOS (`CMOS.RAM`, 8 KB) and, when there is a save
-  disk, `SAVEDISK.d88`; Chimera's Export Save Data writes the two as a zip.
+  disk, `SAVEDISK.d88`; Export Save Data (the core's own window, miniBox's
+  ready-made one since Chimera issue 610) writes the two as a zip.
   The project's save data slot takes back either file, or the zip, and the
   machine starts with them. A save disk in the save data is the machine's
   save disk even with the setting off. A file or zip entry the core does not
