@@ -44,59 +44,63 @@ for line in io.lines(jobPath) do
 end
 meta.metaPath = job.meta
 
-if emu.getsystemid() ~= "FMTowns" then
-	finish("ERROR", "wrong system id: " .. tostring(emu.getsystemid()))
-end
-if emu.getcorename() ~= "Geartowns" then
-	finish("ERROR", "wrong core: " .. tostring(emu.getcorename()))
-end
-
-pcall(function() client.speedmode(6400) end)
-pcall(function() client.invisibleemulation(true) end)
-
--- job "hold=" names buttons (comma separated) pressed on EVERY frame, so a
--- settings leg can prove input flows (an idle machine cannot see its ports)
-local held = {}
-if job.hold ~= nil and job.hold ~= "" then
-	for name in string.gmatch(job.hold, "[^,]+") do
-		held[name] = true
+local function body()
+	if emu.getcorename() ~= "Geartowns" then
+		finish("ERROR", "wrong core: " .. tostring(emu.getcorename()))
 	end
-end
 
--- In Chimera's window the movie is what plays: a script's joypad.set reaches
--- the core only while TAStudio is recording, so turn that on before holding.
-if next(held) ~= nil then
-	pcall(function() tastudio.setrecording(true) end)
-	if not tastudio.getrecording() then
-		finish("ERROR", "TAStudio would not record, so the held buttons cannot reach the core")
+	pcall(function() client.speedmode(6400) end)
+	pcall(function() client.invisibleemulation(true) end)
+
+	-- job "hold=" names buttons (comma separated) pressed on EVERY frame, so a
+	-- settings leg can prove input flows (an idle machine cannot see its ports)
+	local held = {}
+	if job.hold ~= nil and job.hold ~= "" then
+		for name in string.gmatch(job.hold, "[^,]+") do
+			held[name] = true
+		end
 	end
-end
 
-local frames = tonumber(job.frames) or 120
-for _ = 1, frames do
+	-- In Chimera's window the movie is what plays: a script's joypad.set reaches
+	-- the core only while TAStudio is recording, so turn that on before holding.
 	if next(held) ~= nil then
-		joypad.set(held)
+		pcall(function() tastudio.setrecording(true) end)
+		if not tastudio.getrecording() then
+			finish("ERROR", "TAStudio would not record, so the held buttons cannot reach the core")
+		end
 	end
-	emu.frameadvance()
+
+	local frames = tonumber(job.frames) or 120
+	for _ = 1, frames do
+		if next(held) ~= nil then
+			joypad.set(held)
+		end
+		emu.frameadvance()
+	end
+
+	meta.frames = emu.framecount()
+	meta.lag = emu.lagcount()
+	pcall(function()
+		memory.usememorydomain(DOMAIN)
+		meta.ramsize = memory.getcurrentmemorydomainsize()
+		meta.ramhash = memory.hash_region(0, meta.ramsize, DOMAIN)
+	end)
+
+	if job.shot ~= nil and job.shot ~= "" then
+		client.screenshot(job.shot)
+	end
+
+	local ram = memory.read_bytes_as_array(0, meta.ramsize, DOMAIN)
+	local chunks = {}
+	for i = 1, #ram do
+		chunks[i] = string.char(ram[i])
+	end
+	writeAll(job.out, table.concat(chunks))
+
+	finish("OK", "")
 end
 
-meta.frames = emu.framecount()
-meta.lag = emu.lagcount()
-pcall(function()
-	memory.usememorydomain(DOMAIN)
-	meta.ramsize = memory.getcurrentmemorydomainsize()
-	meta.ramhash = memory.hash_region(0, meta.ramsize, DOMAIN)
-end)
-
-if job.shot ~= nil and job.shot ~= "" then
-	client.screenshot(job.shot)
+local ok, err = xpcall(body, debug.traceback)
+if not ok then
+	finish("ERROR", (tostring(err):gsub("%s*\n%s*", " | ")))
 end
-
-local ram = memory.read_bytes_as_array(0, meta.ramsize, DOMAIN)
-local chunks = {}
-for i = 1, #ram do
-	chunks[i] = string.char(ram[i])
-end
-writeAll(job.out, table.concat(chunks))
-
-finish("OK", "")
